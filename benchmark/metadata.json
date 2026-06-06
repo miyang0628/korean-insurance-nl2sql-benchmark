@@ -1,0 +1,26 @@
+{
+  "title": "생명보험 언더라이팅 NL-to-SQL 벤치마크",
+  "version": "2.0",
+  "total_questions": 80,
+  "source_documents": [
+    "생명보험 표준약관 [별표15]",
+    "보험업감독규정(금융위원회고시 제2024-54호)"
+  ],
+  "categories": [
+    "고지의무", "보험금지급", "계약심사",
+    "보험료산출", "장해리스크", "계약관리",
+    "사기탐지", "재무리스크"
+  ],
+  "difficulty_distribution": {
+    "simple": 16,
+    "moderate": 37,
+    "challenging": 27
+  },
+  "sensitive_info_distribution": {
+    "high": 28,
+    "medium": 36,
+    "low": 16
+  },
+  "sql_dialect": "SQLite",
+  "language": "ko"
+}

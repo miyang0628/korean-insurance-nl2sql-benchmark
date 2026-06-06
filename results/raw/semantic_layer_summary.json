@@ -1,0 +1,31 @@
+{
+  "method": "semantic_layer",
+  "model": "gpt-4o-mini",
+  "n_questions": 80,
+  "n_repeat": 3,
+  "overall_ex": 0.2917,
+  "overall_ex_pct": 29.2,
+  "avg_latency_ms": 1797.5,
+  "median_latency_ms": 1426.4,
+  "iter_std": 0.0072,
+  "n_api_errors": 0,
+  "n_exec_errors": 48,
+  "sensitive_cols_exposed": 0,
+  "sensitive_cols_text2sql": 23,
+  "sensitive_col_reduction_pct": 100.0,
+  "diff_ex": {
+    "simple": 35.7,
+    "moderate": 31.9,
+    "challenging": 18.3
+  },
+  "cat_ex": {
+    "사기탐지": 52.4,
+    "고지의무": 50.0,
+    "장해리스크": 35.9,
+    "보험금지급": 35.7,
+    "계약심사": 30.8,
+    "계약관리": 15.4,
+    "보험료산출": 10.0,
+    "재무리스크": 0.0
+  }
+}

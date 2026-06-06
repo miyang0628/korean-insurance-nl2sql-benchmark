@@ -1,0 +1,29 @@
+{
+  "method": "text2sql",
+  "model": "gpt-4o-mini",
+  "n_questions": 80,
+  "n_repeat": 3,
+  "overall_ex": 0.2375,
+  "overall_ex_pct": 23.8,
+  "avg_latency_ms": 1652.1,
+  "median_latency_ms": 1388.3,
+  "iter_std": 0.0217,
+  "n_api_errors": 0,
+  "n_exec_errors": 47,
+  "sensitive_cols_exposed": 23,
+  "diff_ex": {
+    "simple": 28.6,
+    "moderate": 24.6,
+    "challenging": 18.3
+  },
+  "cat_ex": {
+    "사기탐지": 42.9,
+    "계약심사": 38.5,
+    "고지의무": 33.3,
+    "보험금지급": 26.2,
+    "계약관리": 23.1,
+    "장해리스크": 10.3,
+    "보험료산출": 10.0,
+    "재무리스크": 0.0
+  }
+}

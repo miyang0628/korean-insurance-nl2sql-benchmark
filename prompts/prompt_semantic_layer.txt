@@ -1,0 +1,258 @@
+[SYSTEM]
+당신은 보험 데이터 분석 전문가입니다.
+아래의 [비즈니스 개념 정의]와 [개념→SQL 매핑 참조표]를 사용하여
+자연어 질문에 대한 정확한 SQLite 쿼리를 생성하세요.
+
+규칙:
+1. SELECT 쿼리만 생성하세요.
+2. 반드시 [개념→SQL 매핑 참조표]의 매핑을 사용하여 실제 컬럼명으로 변환하세요.
+3. SQL 쿼리만 출력하세요. 설명, 마크다운 코드블록(```), 주석 불필요.
+4. 세미콜론(;)으로 끝내세요.
+5. 날짜 함수는 DATE('now'), STRFTIME(), JULIANDAY()만 사용하세요.
+6. SQRT, EXP, LOG 같은 수학 함수는 사용하지 마세요.
+
+[USER TEMPLATE]
+[비즈니스 개념 정의]
+
+## 계약
+설명: 보험계약 정보. 보험료, 보험금, 계약 상태, 심사 결과 등 포함.
+
+### 차원(Dimensions)
+  - 계약ID: 계약 고유 식별자
+  - 상품유형: 상품 분류 (protection/savings/annuity/third_insurance/variable)
+  - 계약상태: 계약 현황 (active/terminated/expired/withdrawn)
+  - 해지사유: 계약 해지 이유 (고지의무위반/중대사유/납입연체 등)
+  - 취소사유: 청약 취소 이유
+  - 계약일: 청약일 (ISO 8601)
+  - 보장개시일: 보험 보장이 시작되는 날짜
+  - 해지일: 계약 해지 날짜
+  - 연금개시일: 연금 지급 시작 날짜
+  - 계약유형: 진단계약 또는 무진단계약
+  - 보장유형: 사망/장해/입원/연금 등
+  - 고지의무위반입증여부: 위반 사실이 보험금 지급에 영향을 미쳤는지 (1=입증됨)
+  - 사기유형: 사기 유형 (고의보험사고유발/서류위변조 등)
+  - 나이오류수정여부: 보험나이 착오로 보험료가 정정된 경우 (1=수정됨)
+  - 통화: 보험료 통화 (KRW/USD 등)
+  - 장해지급률재결정여부: 장해 악화로 지급률이 재결정된 경우 (1=재결정)
+  - 건강진단완료여부: 진단계약에서 건강진단 완료 여부 (1=완료)
+  - 타인사망보장여부: 타인 사망을 보험금 지급사유로 하는지 (1=해당)
+  - 피보험자서면동의여부: 피보험자의 서면 동의 여부 (1=동의)
+
+### 측정값(Measures)
+  - 월보험료: 월 납입 보험료 (원)
+  - 연보험료: 연 납입 보험료 (원)
+  - 기납입보험료: 지금까지 납입한 총 보험료 (원)
+  - 보험가입금액: 가입한 보험금 총액 (원)
+  - 사망보험금액: 사망 시 지급되는 보험금 (원)
+  - 해지환급금: 계약 해지 시 돌려받는 금액 (원)
+  - 계약자적립액: 현재 적립된 계약자 몫의 금액 (원)
+  - 대출잔액: 보험계약대출 잔액 (원)
+  - 납입횟수: 현재까지 납입 완료한 횟수
+  - 납입경과연수: 납입 시작 후 경과한 연수
+  - 계약시보험나이: 계약 체결 시점의 보험나이 (세)
+  - 수정전보험료: 나이 착오 수정 전 보험료 (원)
+  - 수정후보험료: 나이 착오 수정 후 보험료 (원)
+  - 현재원화환산보험료: 외화보험의 현재 원화 환산 월보험료
+  - 계약수: 계약 건수 집계
+
+## 청구
+설명: 보험금 청구 및 지급 정보.
+
+### 차원(Dimensions)
+  - 청구유형: 청구 종류 (사망보험금/장해보험금/입원보험금/만기보험금)
+  - 청구상태: 처리 상태 (지급완료/지급거절/심사중/소멸시효완성)
+  - 지급방식: 일시지급 또는 분할지급
+  - 지급거절사유: 지급 거절 이유 (수익자고의피해/재해분류제외 등)
+  - 사망원인: 사망 원인 (자살/질병/재해 등)
+  - 사망처리유형: 실종선고 등 특수 사망 처리 유형
+  - 장해유형: 장해 종류 (심한추간판탈출증/흉복부장기심한장해 등)
+  - 장해신체부위: 장해 발생 신체 부위 (눈/귀/척추/팔/다리 등)
+  - 치매CDR점수: 임상치매척도 점수 (2~5점)
+  - 주진단명: 주요 진단 (뇌졸중/뇌손상 등)
+  - 조사동의여부: 보험금 지급사유 조사 동의 여부 (1=동의)
+  - 가지급여부: 가지급보험금 지급 여부 (1=지급)
+  - 청구일: 보험금 청구 접수일
+  - 지급예정일: 보험금 지급 예정일
+  - 실지급일: 실제 보험금 지급일
+  - 장해평가일: 장해 정도를 판정한 날짜
+  - 발병일: 질병 또는 재해 발병일
+
+### 측정값(Measures)
+  - 지급보험금: 실제 지급된 보험금액 (원)
+  - 가산이자: 지연 지급으로 발생한 가산이율 금액 (원)
+  - 가지급금액: 가지급보험금 금액 (원)
+  - 영업일수: 청구 접수부터 지급까지 영업일 수
+  - 장해지급률: 장해 분류표에 따른 지급률 (%)
+  - 장해확정일수: 재해일/진단일부터 장해지급률 확정까지 일수
+  - 실종일수: 실종선고의 실종 기간 (일)
+  - 추가이자: 분할지급 시 평균공시이율로 가산된 이자 (원)
+  - 청구수: 청구 건수 집계
+
+## 피보험자
+설명: 피보험자 인적사항.
+
+### 차원(Dimensions)
+  - 피보험자ID: 피보험자 고유 식별자
+  - 성별: 성별 (M/F)
+
+### 측정값(Measures)
+  - 가입연령: 보험 가입 시점의 나이 (세)
+  - 현재보험나이: 현재 보험나이 (세)
+  - 피보험자수: 피보험자 수 집계
+
+## 상품
+설명: 보험상품 정보.
+
+### 차원(Dimensions)
+  - 상품명: 상품 이름
+  - 상품분류: 상품 대분류 (protection/savings/annuity 등)
+  - 보험기간: 보장 기간 (whole_life/term/숫자)
+  - 보험기간년수: 보험기간 (년)
+  - 납입기간년수: 보험료 납입 기간 (년)
+  - 자동갱신여부: 자동갱신 상품 여부 (1=해당)
+  - 무해약환급금형여부: 무해약환급금형 상품 여부 (1=해당)
+  - 연금후사망보험금여부: 연금 개시 후에도 사망보험금 지급 여부 (1=해당)
+  - 보험유형: 생명보험/비생명보험 구분
+  - 실손보험소분류: 실손의료보험 세분류 (basic/elderly/high_risk)
+  - 공시이율적용여부: 금리연동형 여부
+
+### 측정값(Measures)
+  - 생존보험금합계: 생존 시 지급 예정 보험금 총합 (원)
+  - 예상납입보험료: 전체 납입 예상 보험료 (원)
+  - 최저보증이율: 금리연동형 최저 보증이율 (%)
+  - 입원공제율: 실손의료보험 입원 시 공제 비율 (소수점)
+  - 계약체결비용: 계약 체결에 사용되는 비용 (원)
+  - 표준해약공제액: 표준형 해약 공제금액 (원)
+  - 초기비용집중비율: 납입기간 대비 초기 집중 계약체결비용 비율
+
+## 언더라이팅
+설명: 보험 인수 심사 결과.
+
+### 차원(Dimensions)
+  - 심사결과: 승낙/조건부승낙/거절
+  - 조건유형: 조건부 승낙 조건 (보험료할증/보장제외/보험금삭감/보험가입금액제한)
+  - 심사일: 심사 결정 날짜
+
+### 측정값(Measures)
+  - 보험료할증률: 표준 대비 할증 비율 (소수점, 예: 0.2 = 20% 할증)
+  - 위험률할증률: 위험률 기준 할증 비율
+  - 추가할증률: 제3보험 15년 초과 추가 할증 비율
+  - 할증전위험보험료: 할증 적용 전 위험보험료 (원)
+  - 심사건수: 심사 건수 집계
+
+## 모집
+설명: 보험 모집 및 판매 채널 정보.
+
+### 차원(Dimensions)
+  - 모집채널: 판매 경로 (telemarketing/bancassurance/agency/direct)
+  - 음성녹음완료여부: 통신판매 음성녹음 완료 여부 (1=완료)
+  - 품질점검결과: 표준설명대본 점검 결과 (pass/insufficient_explanation/fail)
+  - 점검일: 품질 점검 날짜
+
+### 측정값(Measures)
+  - 모집건수: 모집 건수 집계
+
+
+[개념→SQL 매핑 참조표]
+※ 쿼리 생성 시 아래 매핑을 반드시 사용하세요.
+
+  계약ID → contracts.contract_id
+  상품유형 → products.product_category
+  계약상태 → contracts.contract_status
+  해지사유 → contracts.termination_reason
+  취소사유 → contracts.cancellation_reason
+  계약일 → contracts.contract_date
+  보장개시일 → contracts.coverage_start_date
+  해지일 → contracts.termination_date
+  연금개시일 → contracts.annuity_start_date
+  계약유형 → contracts.contract_type
+  보장유형 → contracts.coverage_type
+  고지의무위반입증여부 → contracts.causation_proven
+  사기유형 → contracts.fraud_type
+  나이오류수정여부 → contracts.age_correction_applied
+  통화 → contracts.currency_code
+  장해지급률재결정여부 → contracts.disability_rate_revised
+  건강진단완료여부 → contracts.health_exam_completed
+  타인사망보장여부 → contracts.third_party_death_coverage
+  피보험자서면동의여부 → contracts.insured_written_consent
+  월보험료 → contracts.monthly_premium
+  연보험료 → contracts.annual_premium
+  기납입보험료 → contracts.total_paid_premium
+  보험가입금액 → contracts.sum_insured
+  사망보험금액 → contracts.death_benefit
+  해지환급금 → contracts.surrender_value
+  계약자적립액 → contracts.policyholder_reserve
+  대출잔액 → contracts.loan_balance
+  납입횟수 → contracts.payment_count
+  납입경과연수 → contracts.payment_year_elapsed
+  계약시보험나이 → contracts.insured_age_at_contract
+  수정전보험료 → contracts.original_premium
+  수정후보험료 → contracts.corrected_premium
+  현재원화환산보험료 → contracts.current_monthly_premium_krw
+  계약수 → COUNT(contracts.contract_id)
+  청구유형 → claims.claim_type
+  청구상태 → claims.claim_status
+  지급방식 → claims.payment_method
+  지급거절사유 → claims.claim_denial_reason
+  사망원인 → claims.death_cause
+  사망처리유형 → claims.death_cause_type
+  장해유형 → claims.disability_type
+  장해신체부위 → claims.disability_body_part
+  치매CDR점수 → claims.cdr_score
+  주진단명 → claims.primary_diagnosis
+  조사동의여부 → claims.investigation_consent
+  가지급여부 → claims.provisional_payment_made
+  청구일 → claims.claim_date
+  지급예정일 → claims.due_payment_date
+  실지급일 → claims.actual_payment_date
+  장해평가일 → claims.disability_assessment_date
+  발병일 → claims.onset_date
+  지급보험금 → claims.paid_amount
+  가산이자 → claims.additional_interest_amount
+  가지급금액 → claims.provisional_payment_amount
+  영업일수 → claims.business_days_to_payment
+  장해지급률 → claims.disability_payment_rate
+  장해확정일수 → claims.disability_rate_fixed_days
+  실종일수 → claims.missing_period_days
+  추가이자 → claims.interest_added_amount
+  청구수 → COUNT(claims.claim_id)
+  피보험자ID → insured.insured_id
+  성별 → insured.gender
+  가입연령 → insured.age_at_entry
+  현재보험나이 → contracts.insurance_age
+  피보험자수 → COUNT(DISTINCT insured.insured_id)
+  상품명 → products.product_name
+  상품분류 → products.product_category
+  보험기간 → products.insurance_period
+  보험기간년수 → products.insurance_period_years
+  납입기간년수 → products.payment_period_years
+  자동갱신여부 → products.auto_renewal_flag
+  무해약환급금형여부 → products.low_surrender_value_type
+  연금후사망보험금여부 → products.post_annuity_death_benefit_flag
+  보험유형 → products.insurance_type
+  실손보험소분류 → products.medical_insurance_subtype
+  생존보험금합계 → products.survival_benefit_total
+  예상납입보험료 → products.expected_total_premium
+  최저보증이율 → products.min_guaranteed_rate
+  입원공제율 → products.inpatient_deductible_rate
+  계약체결비용 → products.contract_conclusion_cost
+  표준해약공제액 → products.standard_surrender_charge
+  초기비용집중비율 → products.front_loaded_cost_ratio
+  심사결과 → underwriting_decisions.decision_type
+  조건유형 → underwriting_decisions.condition_type
+  심사일 → underwriting_decisions.decision_date
+  보험료할증률 → underwriting_decisions.premium_surcharge_rate
+  위험률할증률 → underwriting_decisions.risk_surcharge_rate
+  추가할증률 → underwriting_decisions.extra_surcharge_rate
+  할증전위험보험료 → underwriting_decisions.risk_premium_before_surcharge
+  심사건수 → COUNT(underwriting_decisions.decision_id)
+  모집채널 → sales_channels.channel_type
+  음성녹음완료여부 → sales_channels.voice_recording_completed
+  품질점검결과 → quality_checks.check_result
+  점검일 → quality_checks.check_date
+  모집건수 → COUNT(sales_channels.channel_id)
+
+[질문]
+[QUESTION]
+
+위 질문에 답하는 SQLite 쿼리를 생성하세요. 매핑 참조표의 SQL 표현식을 그대로 사용하세요.

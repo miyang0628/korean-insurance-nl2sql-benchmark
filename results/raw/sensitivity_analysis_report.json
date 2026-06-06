@@ -1,0 +1,45 @@
+{
+  "schema_level": {
+    "t2s_exposed": 23,
+    "sl_exposed": 15,
+    "reduction_pct": 34.8,
+    "by_category": {
+      "건강정보": {
+        "t2s": 10,
+        "sl": 6
+      },
+      "재무정보": {
+        "t2s": 6,
+        "sl": 6
+      },
+      "개인식별정보": {
+        "t2s": 4,
+        "sl": 1
+      },
+      "사기·위반정보": {
+        "t2s": 3,
+        "sl": 2
+      }
+    }
+  },
+  "query_level": {
+    "t2s_avg_tokens_per_query": 0.4708,
+    "sl_avg_tokens_per_query": 0.575,
+    "t2s_queries_with_exposure_pct": 35.8,
+    "sl_queries_with_exposure_pct": 40.0
+  },
+  "ex_by_sensitive_level": {
+    "high": {
+      "t2s_ex_pct": 29.0,
+      "sl_ex_pct": 59.4
+    },
+    "medium": {
+      "t2s_ex_pct": 19.8,
+      "sl_ex_pct": 18.0
+    },
+    "low": {
+      "t2s_ex_pct": 25.0,
+      "sl_ex_pct": 15.0
+    }
+  }
+}

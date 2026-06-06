@@ -1,0 +1,1537 @@
+﻿question_id,category,difficulty,sensitive_info_level,iteration,method,pred_sql,gold_sql,ex,pred_rows,gold_rows,latency_ms,api_error,exec_error
+UW001,고지의무,simple,medium,1,text2sql,"SELECT COUNT(DISTINCT insured_id) AS total_insured_count
+FROM contracts
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(DISTINCT insured_id) FROM contracts WHERE termination_reason = '고지의무위반',1,1,1,2523.77,,
+UW001,고지의무,simple,medium,2,text2sql,"SELECT COUNT(DISTINCT insured_id) AS total_insured_count
+FROM contracts
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(DISTINCT insured_id) FROM contracts WHERE termination_reason = '고지의무위반',1,1,1,994.45,,
+UW001,고지의무,simple,medium,3,text2sql,"SELECT COUNT(DISTINCT insured_id) AS total_insured_count
+FROM contracts
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(DISTINCT insured_id) FROM contracts WHERE termination_reason = '고지의무위반',1,1,1,7223.4,,
+UW002,고지의무,moderate,medium,1,text2sql,"SELECT strftime('%Y', termination_date) AS year, COUNT(*) AS count
+FROM contracts
+WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years')
+GROUP BY year
+ORDER BY year;","SELECT STRFTIME('%Y', termination_date) AS year, COUNT(*) AS cnt FROM contracts WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years') GROUP BY STRFTIME('%Y', termination_date) ORDER BY year",1,2,2,1933.27,,
+UW002,고지의무,moderate,medium,2,text2sql,"SELECT 
+    strftime('%Y', termination_date) AS year, 
+    COUNT(*) AS count 
+FROM 
+    contracts 
+WHERE 
+    termination_reason = '고지의무위반' 
+    AND termination_date >= DATE('now', '-3 years') 
+GROUP BY 
+    year 
+ORDER BY 
+    year;","SELECT STRFTIME('%Y', termination_date) AS year, COUNT(*) AS cnt FROM contracts WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years') GROUP BY STRFTIME('%Y', termination_date) ORDER BY year",1,2,2,1264.12,,
+UW002,고지의무,moderate,medium,3,text2sql,"SELECT strftime('%Y', termination_date) AS year, COUNT(*) AS count
+FROM contracts
+WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years')
+GROUP BY year
+ORDER BY year;","SELECT STRFTIME('%Y', termination_date) AS year, COUNT(*) AS cnt FROM contracts WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years') GROUP BY STRFTIME('%Y', termination_date) ORDER BY year",1,2,2,1559.27,,
+UW003,고지의무,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(*) FROM contracts WHERE termination_reason = '고지의무위반' AND causation_proven = 1,0,1,1,1268.29,,
+UW003,고지의무,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(*) FROM contracts WHERE termination_reason = '고지의무위반' AND causation_proven = 1,0,1,1,727.02,,
+UW003,고지의무,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE termination_reason = '고지의무위반';",SELECT COUNT(*) FROM contracts WHERE termination_reason = '고지의무위반' AND causation_proven = 1,0,1,1,941.13,,
+UW004,고지의무,moderate,high,1,text2sql,"SELECT COUNT(DISTINCT insured_id) AS insured_count
+FROM medical_history
+WHERE treatment_date >= DATE('now', '-5 years');","SELECT COUNT(DISTINCT insured_id) FROM medical_history WHERE treatment_date BETWEEN contract_date AND DATE(contract_date, '+5 years') AND diagnosis_code = prior_diagnosis_code",0,1,1,1117.44,,
+UW004,고지의무,moderate,high,2,text2sql,"SELECT COUNT(DISTINCT insured_id) AS insured_count
+FROM medical_history
+WHERE treatment_date >= DATE('now', '-5 years');","SELECT COUNT(DISTINCT insured_id) FROM medical_history WHERE treatment_date BETWEEN contract_date AND DATE(contract_date, '+5 years') AND diagnosis_code = prior_diagnosis_code",0,1,1,1026.3,,
+UW004,고지의무,moderate,high,3,text2sql,"SELECT COUNT(DISTINCT insured_id) AS insured_count
+FROM medical_history
+WHERE treatment_date >= DATE('now', '-5 years');","SELECT COUNT(DISTINCT insured_id) FROM medical_history WHERE treatment_date BETWEEN contract_date AND DATE(contract_date, '+5 years') AND diagnosis_code = prior_diagnosis_code",0,1,1,2434.09,,
+UW005,사기탐지,simple,high,1,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE termination_reason = '진단서 위변조' OR termination_reason = '대리진단';","SELECT COUNT(*) FROM contracts WHERE cancellation_reason IN ('대리진단', '진단서위변조', '사기')",0,1,1,867.69,,
+UW005,사기탐지,simple,high,2,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE termination_reason = '진단서 위변조' OR termination_reason = '대리진단';","SELECT COUNT(*) FROM contracts WHERE cancellation_reason IN ('대리진단', '진단서위변조', '사기')",0,1,1,1150.36,,
+UW005,사기탐지,simple,high,3,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE termination_reason = '고지의무위반' OR termination_reason = '사기';","SELECT COUNT(*) FROM contracts WHERE cancellation_reason IN ('대리진단', '진단서위변조', '사기')",0,1,1,1145.08,,
+UW006,사기탐지,moderate,high,1,text2sql,"SELECT 
+    (COUNT(CASE WHEN contract_status = '무효' THEN 1 END) * 100.0 / COUNT(*)) AS cancellation_rate
+FROM 
+    contracts
+WHERE 
+    termination_date IS NOT NULL 
+    AND JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) <= 5 * 365;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) AS INTEGER) <= 1825 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contracts WHERE cancellation_reason = '사기'",1,1,1,1371.38,,
+UW006,사기탐지,moderate,high,2,text2sql,"SELECT 
+    (COUNT(CASE WHEN contract_status = '무효' THEN 1 END) * 100.0 / COUNT(*)) AS cancellation_rate
+FROM 
+    contracts
+WHERE 
+    termination_date IS NOT NULL 
+    AND JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) <= 5 * 365;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) AS INTEGER) <= 1825 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contracts WHERE cancellation_reason = '사기'",1,1,1,1188.92,,
+UW006,사기탐지,moderate,high,3,text2sql,"SELECT 
+    COUNT(*) * 100.0 / (SELECT COUNT(*) FROM contracts WHERE contract_status = 'terminated') AS cancellation_rate
+FROM 
+    contracts
+WHERE 
+    contract_status = 'terminated' 
+    AND termination_date IS NOT NULL 
+    AND JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) <= 5 * 365;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) AS INTEGER) <= 1825 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contracts WHERE cancellation_reason = '사기'",0,1,1,2366.28,,
+UW007,계약심사,simple,medium,1,text2sql,"SELECT 
+    SUM(CASE WHEN decision_type = '거절' THEN 1 ELSE 0 END) AS rejected_count,
+    SUM(CASE WHEN decision_type = '조건부승낙' THEN 1 ELSE 0 END) AS conditional_accepted_count
+FROM underwriting_decisions
+WHERE contract_id IN (SELECT contract_id FROM contracts WHERE insured_id NOT IN (SELECT insured_id FROM insured));","SELECT decision_type, COUNT(*) AS cnt FROM underwriting_decisions WHERE decision_type IN ('거절', '조건부승낙') GROUP BY decision_type",0,1,2,1089.59,,
+UW007,계약심사,simple,medium,2,text2sql,"SELECT 
+    SUM(CASE WHEN decision_type = '거절' THEN 1 ELSE 0 END) AS rejected_count,
+    SUM(CASE WHEN decision_type = '조건부승낙' THEN 1 ELSE 0 END) AS conditional_accepted_count
+FROM underwriting_decisions
+WHERE contract_id IN (SELECT contract_id FROM contracts WHERE insured_id NOT IN (SELECT insured_id FROM insured));","SELECT decision_type, COUNT(*) AS cnt FROM underwriting_decisions WHERE decision_type IN ('거절', '조건부승낙') GROUP BY decision_type",0,1,2,1136.8,,
+UW007,계약심사,simple,medium,3,text2sql,"SELECT 
+    SUM(CASE WHEN decision_type = '거절' THEN 1 ELSE 0 END) AS rejected_count,
+    SUM(CASE WHEN decision_type = '조건부승낙' THEN 1 ELSE 0 END) AS conditional_accepted_count
+FROM underwriting_decisions
+WHERE contract_id IN (SELECT contract_id FROM contracts WHERE insured_id NOT IN (SELECT insured_id FROM insured));","SELECT decision_type, COUNT(*) AS cnt FROM underwriting_decisions WHERE decision_type IN ('거절', '조건부승낙') GROUP BY decision_type",0,1,2,1562.3,,
+UW008,보험료산출,simple,medium,1,text2sql,"SELECT AVG(premium_surcharge_rate) AS average_surcharge_rate
+FROM underwriting_decisions
+WHERE decision_type = '승낙' AND condition_type = '보험료할증';",SELECT AVG(premium_surcharge_rate) FROM underwriting_decisions WHERE decision_type = '조건부승낙' AND condition_type = '보험료할증',0,1,1,1289.5,,
+UW008,보험료산출,simple,medium,2,text2sql,"SELECT AVG(premium_surcharge_rate) AS average_surcharge_rate 
+FROM underwriting_decisions 
+WHERE decision_type = '승낙';",SELECT AVG(premium_surcharge_rate) FROM underwriting_decisions WHERE decision_type = '조건부승낙' AND condition_type = '보험료할증',0,1,1,729.26,,
+UW008,보험료산출,simple,medium,3,text2sql,"SELECT AVG(premium_surcharge_rate) AS average_surcharge_rate 
+FROM underwriting_decisions 
+WHERE decision_type = '승낙';",SELECT AVG(premium_surcharge_rate) FROM underwriting_decisions WHERE decision_type = '조건부승낙' AND condition_type = '보험료할증',0,1,1,803.83,,
+UW009,계약심사,moderate,medium,1,text2sql,"SELECT exclusion_type, COUNT(*) AS count
+FROM contract_exclusions
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM underwriting_decisions
+    WHERE decision_type = '승낙' AND condition_type = '보장제외'
+)
+GROUP BY exclusion_type;","SELECT exclusion_type, COUNT(*) AS cnt FROM contract_exclusions GROUP BY exclusion_type ORDER BY cnt DESC",0,0,4,2165.36,,
+UW009,계약심사,moderate,medium,2,text2sql,"SELECT exclusion_type, COUNT(*) AS excluded_count
+FROM contract_exclusions
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM underwriting_decisions
+    WHERE decision_type = '승낙' AND condition_type = '보장제외'
+)
+GROUP BY exclusion_type;","SELECT exclusion_type, COUNT(*) AS cnt FROM contract_exclusions GROUP BY exclusion_type ORDER BY cnt DESC",0,0,4,1077.15,,
+UW009,계약심사,moderate,medium,3,text2sql,"SELECT exclusion_type, COUNT(*) AS excluded_count
+FROM contract_exclusions
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM underwriting_decisions
+    WHERE decision_type = '승낙' AND condition_type = '보장제외'
+)
+GROUP BY exclusion_type;","SELECT exclusion_type, COUNT(*) AS cnt FROM contract_exclusions GROUP BY exclusion_type ORDER BY cnt DESC",0,0,4,1187.47,,
+UW010,계약심사,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_type = '진단계약' 
+AND health_exam_completed = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_status = '지급거절'
+);",SELECT COUNT(*) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.contract_type = '진단계약' AND ct.health_exam_completed = 0 AND c.claim_status = '지급거절',1,1,1,939.25,,
+UW010,계약심사,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_type = '진단계약' 
+AND health_exam_completed = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_status = '지급거절'
+);",SELECT COUNT(*) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.contract_type = '진단계약' AND ct.health_exam_completed = 0 AND c.claim_status = '지급거절',1,1,1,1518.79,,
+UW010,계약심사,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_type = '진단계약' 
+AND health_exam_completed = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_status = '지급거절'
+);",SELECT COUNT(*) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.contract_type = '진단계약' AND ct.health_exam_completed = 0 AND c.claim_status = '지급거절',1,1,1,1338.93,,
+UW011,보험금지급,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '사망보험금' 
+AND claim_status = '지급거절' 
+AND claim_date <= DATE(coverage_start_date, '+2 years');",SELECT COUNT(*) FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '사망보험금' AND cl.death_cause = '자살' AND CAST(JULIANDAY(cl.claim_date) - JULIANDAY(ct.coverage_start_date) AS INTEGER) < 730 AND cl.claim_status = '지급거절',0,0,1,922.36,,pred_sql 오류: no such column: coverage_start_date
+UW011,보험금지급,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '사망보험금' 
+AND claim_status = '지급거절' 
+AND claim_date <= DATE(coverage_start_date, '+2 years');",SELECT COUNT(*) FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '사망보험금' AND cl.death_cause = '자살' AND CAST(JULIANDAY(cl.claim_date) - JULIANDAY(ct.coverage_start_date) AS INTEGER) < 730 AND cl.claim_status = '지급거절',0,0,1,966.8,,pred_sql 오류: no such column: coverage_start_date
+UW011,보험금지급,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '사망보험금' 
+AND claim_status = '지급거절' 
+AND claim_date <= DATE(coverage_start_date, '+2 years');",SELECT COUNT(*) FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '사망보험금' AND cl.death_cause = '자살' AND CAST(JULIANDAY(cl.claim_date) - JULIANDAY(ct.coverage_start_date) AS INTEGER) < 730 AND cl.claim_status = '지급거절',0,0,1,949.94,,pred_sql 오류: no such column: coverage_start_date
+UW012,보험금지급,moderate,medium,1,text2sql,"SELECT COUNT(*) AS delayed_claims_count, AVG(business_days_to_payment) AS average_delay_days
+FROM claims
+WHERE investigation_consent = 0;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(actual_payment_date) - JULIANDAY(claim_date) AS INTEGER)) AS avg_delay_days FROM claims WHERE investigation_consent = 0 AND actual_payment_date IS NOT NULL",0,1,1,7868.0,,
+UW012,보험금지급,moderate,medium,2,text2sql,"SELECT COUNT(*) AS delayed_count, AVG(missing_period_days) AS average_delay_days
+FROM claims
+WHERE investigation_consent = 0;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(actual_payment_date) - JULIANDAY(claim_date) AS INTEGER)) AS avg_delay_days FROM claims WHERE investigation_consent = 0 AND actual_payment_date IS NOT NULL",0,1,1,1398.6,,
+UW012,보험금지급,moderate,medium,3,text2sql,"SELECT COUNT(*) AS delayed_claims_count, AVG(business_days_to_payment) AS average_delay_days
+FROM claims
+WHERE investigation_consent = 0;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(actual_payment_date) - JULIANDAY(claim_date) AS INTEGER)) AS avg_delay_days FROM claims WHERE investigation_consent = 0 AND actual_payment_date IS NOT NULL",0,1,1,1922.97,,
+UW013,장해리스크,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '장해보험금' 
+AND disability_payment_rate IS NULL 
+AND JULIANDAY('now') - JULIANDAY(claim_date) <= 180;",SELECT COUNT(*) FROM claims WHERE claim_type = '장해보험금' AND disability_rate_fixed_days > 180,0,1,1,1178.22,,
+UW013,장해리스크,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '장해보험금' 
+AND disability_payment_rate IS NULL 
+AND JULIANDAY('now') - JULIANDAY(claim_date) <= 180;",SELECT COUNT(*) FROM claims WHERE claim_type = '장해보험금' AND disability_rate_fixed_days > 180,0,1,1,946.58,,
+UW013,장해리스크,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '장해보험금' 
+AND disability_payment_rate IS NOT NULL 
+AND disability_payment_rate > 0 
+AND JULIANDAY('now') - JULIANDAY(claim_date) <= 180;",SELECT COUNT(*) FROM claims WHERE claim_type = '장해보험금' AND disability_rate_fixed_days > 180,0,1,1,1441.76,,
+UW014,장해리스크,simple,high,1,text2sql,"SELECT COUNT(*) AS serious_disability_count, AVG(paid_amount) AS average_payment_amount
+FROM claims
+WHERE disability_payment_rate = 100;","SELECT COUNT(*) AS cnt, AVG(paid_amount) AS avg_paid FROM claims WHERE disability_payment_rate = 100 AND claim_type = '장해보험금'",1,1,1,1003.72,,
+UW014,장해리스크,simple,high,2,text2sql,"SELECT COUNT(*) AS serious_disability_count, AVG(paid_amount) AS average_payment
+FROM claims
+WHERE disability_payment_rate = 100;","SELECT COUNT(*) AS cnt, AVG(paid_amount) AS avg_paid FROM claims WHERE disability_payment_rate = 100 AND claim_type = '장해보험금'",1,1,1,907.6,,
+UW014,장해리스크,simple,high,3,text2sql,"SELECT COUNT(*) AS serious_disability_count, AVG(paid_amount) AS average_payment
+FROM claims
+WHERE disability_payment_rate = 100;","SELECT COUNT(*) AS cnt, AVG(paid_amount) AS avg_paid FROM claims WHERE disability_payment_rate = 100 AND claim_type = '장해보험금'",1,1,1,779.22,,
+UW015,장해리스크,simple,high,1,text2sql,"SELECT SUM(paid_amount) AS total_claim_amount
+FROM claims
+WHERE disability_type = '척추 장해' AND disability_subtype = '심한 추간판탈출증(디스크)';",SELECT SUM(paid_amount) FROM claims WHERE disability_type = '심한추간판탈출증' AND claim_type = '장해보험금',0,1,1,849.03,,
+UW015,장해리스크,simple,high,2,text2sql,"SELECT SUM(paid_amount) AS total_claim_amount
+FROM claims
+WHERE disability_type = '척추 장해' AND disability_subtype = '심한 추간판탈출증(디스크)';",SELECT SUM(paid_amount) FROM claims WHERE disability_type = '심한추간판탈출증' AND claim_type = '장해보험금',0,1,1,1345.49,,
+UW015,장해리스크,simple,high,3,text2sql,"SELECT SUM(paid_amount) AS total_claim_amount
+FROM claims
+WHERE disability_type = '척추 장해' AND disability_subtype = '심한 추간판탈출증(디스크)';",SELECT SUM(paid_amount) FROM claims WHERE disability_type = '심한추간판탈출증' AND claim_type = '장해보험금',0,1,1,1295.29,,
+UW016,장해리스크,moderate,high,1,text2sql,"SELECT disability_type, COUNT(*) AS claim_count
+FROM claims
+WHERE disability_body_part = '눈'
+GROUP BY disability_type;","SELECT disability_subtype, COUNT(*) AS cnt, SUM(paid_amount) AS total FROM claims WHERE disability_body_part = '눈' AND claim_type = '장해보험금' GROUP BY disability_subtype ORDER BY cnt DESC",0,0,1,1039.73,,pred_sql 오류: '<' not supported between instances of 'str' and 'NoneType'
+UW016,장해리스크,moderate,high,2,text2sql,"SELECT disability_type, COUNT(*) AS claim_count
+FROM claims
+WHERE disability_body_part = '눈'
+GROUP BY disability_type;","SELECT disability_subtype, COUNT(*) AS cnt, SUM(paid_amount) AS total FROM claims WHERE disability_body_part = '눈' AND claim_type = '장해보험금' GROUP BY disability_subtype ORDER BY cnt DESC",0,0,1,994.19,,pred_sql 오류: '<' not supported between instances of 'str' and 'NoneType'
+UW016,장해리스크,moderate,high,3,text2sql,"SELECT disability_type, COUNT(*) AS claim_count
+FROM claims
+WHERE disability_body_part = '눈'
+GROUP BY disability_type;","SELECT disability_subtype, COUNT(*) AS cnt, SUM(paid_amount) AS total FROM claims WHERE disability_body_part = '눈' AND claim_type = '장해보험금' GROUP BY disability_subtype ORDER BY cnt DESC",0,0,1,881.19,,pred_sql 오류: '<' not supported between instances of 'str' and 'NoneType'
+UW017,장해리스크,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE disability_type = '신경계·정신행동' AND cdr_score >= 3;","SELECT cdr_score, COUNT(*) AS cnt FROM claims WHERE disability_type = '치매' AND cdr_score >= 3 GROUP BY cdr_score ORDER BY cdr_score",0,1,2,1007.03,,
+UW017,장해리스크,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE disability_type = '신경계·정신행동' AND cdr_score >= 3;","SELECT cdr_score, COUNT(*) AS cnt FROM claims WHERE disability_type = '치매' AND cdr_score >= 3 GROUP BY cdr_score ORDER BY cdr_score",0,1,2,941.58,,
+UW017,장해리스크,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE disability_type = '신경계·정신행동' AND cdr_score >= 3;","SELECT cdr_score, COUNT(*) AS cnt FROM claims WHERE disability_type = '치매' AND cdr_score >= 3 GROUP BY cdr_score ORDER BY cdr_score",0,1,2,942.2,,
+UW018,장해리스크,simple,medium,1,text2sql,"SELECT 
+    (COUNT(CASE WHEN claim_type = '장해보험금' THEN 1 END) * 100.0 / COUNT(*)) AS disability_claim_ratio
+FROM 
+    claims
+JOIN 
+    insured ON claims.insured_id = insured.insured_id
+WHERE 
+    insured.insured_age >= 40;","SELECT ROUND(COUNT(CASE WHEN ct.insurance_age >= 40 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '장해보험금'",0,1,1,1662.02,,
+UW018,장해리스크,simple,medium,2,text2sql,"SELECT 
+    (COUNT(CASE WHEN claim_type = '장해보험금' THEN 1 END) * 100.0 / COUNT(*)) AS disability_claim_ratio
+FROM 
+    claims
+JOIN 
+    insured ON claims.insured_id = insured.insured_id
+WHERE 
+    insured.insured_age >= 40;","SELECT ROUND(COUNT(CASE WHEN ct.insurance_age >= 40 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '장해보험금'",0,1,1,1220.79,,
+UW018,장해리스크,simple,medium,3,text2sql,"SELECT 
+    (COUNT(CASE WHEN claim_type = '장해보험금' THEN 1 END) * 100.0 / COUNT(*)) AS disability_claim_ratio
+FROM 
+    claims
+JOIN 
+    insured ON claims.insured_id = insured.insured_id
+WHERE 
+    insured.insured_age >= 40;","SELECT ROUND(COUNT(CASE WHEN ct.insurance_age >= 40 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '장해보험금'",0,1,1,1133.14,,
+UW019,계약심사,simple,high,1,text2sql,"SELECT COUNT(*) AS invalid_contracts_count
+FROM contracts
+WHERE coverage_type = '사망' 
+AND insured_age < 15 
+AND contract_status = '무효';",SELECT COUNT(*) FROM contracts WHERE insured_age_at_contract < 15 AND coverage_type = '사망' AND contract_status = '무효',0,0,1,1142.41,,pred_sql 오류: no such column: insured_age
+UW019,계약심사,simple,high,2,text2sql,"SELECT COUNT(*) AS invalid_claims_count
+FROM contracts
+WHERE coverage_type = '사망' 
+AND insured_age < 15 
+AND contract_status = '무효';",SELECT COUNT(*) FROM contracts WHERE insured_age_at_contract < 15 AND coverage_type = '사망' AND contract_status = '무효',0,0,1,3905.52,,pred_sql 오류: no such column: insured_age
+UW019,계약심사,simple,high,3,text2sql,"SELECT COUNT(*) AS invalid_claims_count
+FROM contracts
+WHERE coverage_type = '사망' 
+AND insured_age < 15 
+AND contract_status = '무효';",SELECT COUNT(*) FROM contracts WHERE insured_age_at_contract < 15 AND coverage_type = '사망' AND contract_status = '무효',0,0,1,913.08,,pred_sql 오류: no such column: insured_age
+UW020,계약심사,simple,medium,1,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_status = '무효' 
+AND insured_written_consent = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_type = '사망보험금'
+);",SELECT COUNT(*) FROM contracts WHERE third_party_death_coverage = 1 AND insured_written_consent = 0 AND contract_status = '무효',1,1,1,1056.2,,
+UW020,계약심사,simple,medium,2,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_status = '무효' 
+AND insured_written_consent = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_type = '사망보험금'
+);",SELECT COUNT(*) FROM contracts WHERE third_party_death_coverage = 1 AND insured_written_consent = 0 AND contract_status = '무효',1,1,1,1371.18,,
+UW020,계약심사,simple,medium,3,text2sql,"SELECT COUNT(*) 
+FROM contracts 
+WHERE contract_status = '무효' 
+AND insured_written_consent = 0 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM claims 
+    WHERE claim_type = '사망보험금'
+);",SELECT COUNT(*) FROM contracts WHERE third_party_death_coverage = 1 AND insured_written_consent = 0 AND contract_status = '무효',1,1,1,1336.43,,
+UW021,계약관리,simple,low,1,text2sql,"SELECT COUNT(*) 
+FROM contract_revivals 
+WHERE revival_reason = '부활' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '납입연체' 
+    AND termination_date >= DATE('now', '-3 years')
+);",SELECT COUNT(*) FROM contract_revivals WHERE CAST(JULIANDAY(revival_application_date) - JULIANDAY(termination_date) AS INTEGER) <= 1095,0,1,1,1157.42,,
+UW021,계약관리,simple,low,2,text2sql,"SELECT COUNT(*) 
+FROM contract_revivals 
+WHERE revival_application_date IS NOT NULL 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '납입연체' 
+    AND termination_date >= DATE('now', '-3 years')
+);",SELECT COUNT(*) FROM contract_revivals WHERE CAST(JULIANDAY(revival_application_date) - JULIANDAY(termination_date) AS INTEGER) <= 1095,0,1,1,1133.7,,
+UW021,계약관리,simple,low,3,text2sql,"SELECT COUNT(*) AS revival_count
+FROM contract_revivals
+WHERE revival_reason = '부활'
+AND contract_id IN (
+    SELECT contract_id
+    FROM contracts
+    WHERE termination_reason = '납입연체'
+    AND termination_date >= DATE('now', '-3 years')
+);",SELECT COUNT(*) FROM contract_revivals WHERE CAST(JULIANDAY(revival_application_date) - JULIANDAY(termination_date) AS INTEGER) <= 1095,0,1,1,4791.14,,
+UW022,계약관리,moderate,medium,1,text2sql,"SELECT COUNT(*) AS contract_count, AVG(loan_balance) AS average_loan_amount
+FROM asset_loan_classifications
+WHERE loan_balance >= (SELECT 0.9 * surrender_value FROM contracts WHERE contracts.contract_id = asset_loan_classifications.contract_id);","SELECT COUNT(*) AS cnt, AVG(loan_balance) AS avg_loan FROM contracts WHERE loan_balance >= surrender_value * 0.9 AND contract_status = '유효'",0,1,1,1212.84,,
+UW022,계약관리,moderate,medium,2,text2sql,"SELECT COUNT(*) AS contract_count, AVG(loan_balance) AS average_loan_amount
+FROM asset_loan_classifications
+WHERE loan_balance >= (SELECT 0.9 * surrender_value FROM contracts WHERE contracts.contract_id = asset_loan_classifications.contract_id);","SELECT COUNT(*) AS cnt, AVG(loan_balance) AS avg_loan FROM contracts WHERE loan_balance >= surrender_value * 0.9 AND contract_status = '유효'",0,1,1,1335.44,,
+UW022,계약관리,moderate,medium,3,text2sql,"SELECT COUNT(*) AS contract_count, AVG(loan_balance) AS average_loan_amount
+FROM asset_loan_classifications
+WHERE loan_balance >= (SELECT AVG(surrender_value) * 0.9 FROM contracts);","SELECT COUNT(*) AS cnt, AVG(loan_balance) AS avg_loan FROM contracts WHERE loan_balance >= surrender_value * 0.9 AND contract_status = '유효'",0,1,1,1301.81,,
+UW023,보험금지급,simple,low,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_status = '소멸시효완성' 
+AND JULIANDAY('now') - JULIANDAY(claim_date) > 365 * 3;",SELECT COUNT(*) FROM claims WHERE claim_status = '소멸시효완성' AND CAST(JULIANDAY(claim_expiry_date) - JULIANDAY(insurance_event_date) AS INTEGER) <= 1095,0,1,1,1081.33,,
+UW023,보험금지급,simple,low,2,text2sql,"SELECT COUNT(*) AS expired_claims_count
+FROM claims
+WHERE claim_status = '소멸시효완성' AND 
+      JULIANDAY('now') - JULIANDAY(claim_date) > 365 * 3;",SELECT COUNT(*) FROM claims WHERE claim_status = '소멸시효완성' AND CAST(JULIANDAY(claim_expiry_date) - JULIANDAY(insurance_event_date) AS INTEGER) <= 1095,0,1,1,2045.69,,
+UW023,보험금지급,simple,low,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_status = '소멸시효완성' 
+AND JULIANDAY('now') - JULIANDAY(claim_date) > 365 * 3;",SELECT COUNT(*) FROM claims WHERE claim_status = '소멸시효완성' AND CAST(JULIANDAY(claim_expiry_date) - JULIANDAY(insurance_event_date) AS INTEGER) <= 1095,0,1,1,946.97,,
+UW024,보험금지급,moderate,low,1,text2sql,"SELECT COUNT(*) AS total_claims, SUM(interest_added_amount) AS total_interest_added
+FROM claims
+WHERE business_days_to_payment > 30 AND claim_status = '지급완료';","SELECT COUNT(*) AS cnt, SUM(additional_interest_amount) AS total_interest FROM claims WHERE CAST(JULIANDAY(actual_payment_date) - JULIANDAY(due_payment_date) AS INTEGER) > 30 AND claim_status = '지급완료'",0,1,1,3288.69,,
+UW024,보험금지급,moderate,low,2,text2sql,"SELECT COUNT(*) AS total_claims, SUM(interest_added_amount) AS total_interest_added
+FROM claims
+WHERE business_days_to_payment > 30;","SELECT COUNT(*) AS cnt, SUM(additional_interest_amount) AS total_interest FROM claims WHERE CAST(JULIANDAY(actual_payment_date) - JULIANDAY(due_payment_date) AS INTEGER) > 30 AND claim_status = '지급완료'",0,1,1,887.62,,
+UW024,보험금지급,moderate,low,3,text2sql,"SELECT COUNT(*) AS total_claims, SUM(interest_added_amount) AS total_interest_added
+FROM claims
+WHERE business_days_to_payment > 30 AND claim_status = '지급완료';","SELECT COUNT(*) AS cnt, SUM(additional_interest_amount) AS total_interest FROM claims WHERE CAST(JULIANDAY(actual_payment_date) - JULIANDAY(due_payment_date) AS INTEGER) > 30 AND claim_status = '지급완료'",0,1,1,1031.69,,
+UW025,사기탐지,moderate,high,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '입원보험금' 
+AND claim_status = '지급거절' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '중대사유'
+);",SELECT COUNT(*) FROM contracts WHERE termination_reason = '중대사유' AND fraud_type = '고의보험사고유발',1,1,1,1331.38,,
+UW025,사기탐지,moderate,high,2,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '입원보험금' 
+AND claim_status = '지급거절' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '중대사유'
+);",SELECT COUNT(*) FROM contracts WHERE termination_reason = '중대사유' AND fraud_type = '고의보험사고유발',1,1,1,2803.88,,
+UW025,사기탐지,moderate,high,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_type = '입원보험금' 
+AND claim_status = '지급거절' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '중대사유'
+);",SELECT COUNT(*) FROM contracts WHERE termination_reason = '중대사유' AND fraud_type = '고의보험사고유발',1,1,1,1592.6,,
+UW026,사기탐지,moderate,high,1,text2sql,"SELECT SUM(paid_amount) AS total_paid_amount
+FROM claims
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM contracts
+    WHERE termination_reason = '중대사유'
+);",SELECT SUM(c.paid_amount) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.termination_reason = '중대사유' AND ct.fraud_type = '서류위변조',0,1,1,1862.73,,
+UW026,사기탐지,moderate,high,2,text2sql,"SELECT SUM(paid_amount) AS total_paid_amount
+FROM claims
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM contracts
+    WHERE termination_reason = '중대사유'
+);",SELECT SUM(c.paid_amount) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.termination_reason = '중대사유' AND ct.fraud_type = '서류위변조',0,1,1,1048.0,,
+UW026,사기탐지,moderate,high,3,text2sql,"SELECT SUM(paid_amount) AS total_paid_amount
+FROM claims
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM contracts
+    WHERE termination_reason = '중대사유'
+);",SELECT SUM(c.paid_amount) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.termination_reason = '중대사유' AND ct.fraud_type = '서류위변조',0,1,1,1009.04,,
+UW027,계약심사,moderate,medium,1,text2sql,"SELECT decision_type, COUNT(*) AS count
+FROM underwriting_decisions
+WHERE decision_type = '조건부승낙'
+GROUP BY decision_type;","SELECT pr.product_category, ud.condition_type, COUNT(*) AS cnt FROM underwriting_decisions ud JOIN contracts ct ON ud.contract_id = ct.contract_id JOIN products pr ON ct.product_id = pr.product_id WHERE ud.decision_type = '조건부승낙' GROUP BY pr.product_category, ud.condition_type ORDER BY pr.product_category, cnt DESC",0,1,12,978.77,,
+UW027,계약심사,moderate,medium,2,text2sql,"SELECT decision_type, COUNT(*) AS count
+FROM underwriting_decisions
+WHERE decision_type = '조건부승낙'
+GROUP BY decision_type;","SELECT pr.product_category, ud.condition_type, COUNT(*) AS cnt FROM underwriting_decisions ud JOIN contracts ct ON ud.contract_id = ct.contract_id JOIN products pr ON ct.product_id = pr.product_id WHERE ud.decision_type = '조건부승낙' GROUP BY pr.product_category, ud.condition_type ORDER BY pr.product_category, cnt DESC",0,1,12,990.09,,
+UW027,계약심사,moderate,medium,3,text2sql,"SELECT decision_type, COUNT(*) AS count
+FROM underwriting_decisions
+WHERE decision_type = '조건부승낙'
+GROUP BY decision_type;","SELECT pr.product_category, ud.condition_type, COUNT(*) AS cnt FROM underwriting_decisions ud JOIN contracts ct ON ud.contract_id = ct.contract_id JOIN products pr ON ct.product_id = pr.product_id WHERE ud.decision_type = '조건부승낙' GROUP BY pr.product_category, ud.condition_type ORDER BY pr.product_category, cnt DESC",0,1,12,942.25,,
+UW028,장해리스크,simple,high,1,text2sql,"SELECT AVG(paid_amount) AS average_amount, MAX(paid_amount) AS max_amount
+FROM claims
+WHERE disability_type = '흉복부장기 기능에 심한 장해(장기이식 포함)';","SELECT AVG(paid_amount) AS avg_paid, MAX(paid_amount) AS max_paid FROM claims WHERE disability_type = '흉복부장기심한장해' AND claim_type = '장해보험금'",0,1,1,1095.36,,
+UW028,장해리스크,simple,high,2,text2sql,"SELECT AVG(paid_amount) AS average_amount, MAX(paid_amount) AS max_amount
+FROM claims
+WHERE claim_type = '장해보험금' AND disability_type = '흉복부장기 기능에 심한 장해(장기이식 포함)';","SELECT AVG(paid_amount) AS avg_paid, MAX(paid_amount) AS max_paid FROM claims WHERE disability_type = '흉복부장기심한장해' AND claim_type = '장해보험금'",0,1,1,1135.39,,
+UW028,장해리스크,simple,high,3,text2sql,"SELECT AVG(paid_amount) AS average_amount, MAX(paid_amount) AS max_amount
+FROM claims
+WHERE claim_type = '장해보험금' AND disability_type = '흉복부장기 기능에 심한 장해(장기이식 포함)';","SELECT AVG(paid_amount) AS avg_paid, MAX(paid_amount) AS max_paid FROM claims WHERE disability_type = '흉복부장기심한장해' AND claim_type = '장해보험금'",0,1,1,1640.96,,
+UW029,장해리스크,moderate,high,1,text2sql,"SELECT AVG(insured_age) AS average_age
+FROM insured
+WHERE insured_id IN (
+    SELECT insured_id
+    FROM claims
+    WHERE claim_type = '장해보험금'
+    AND additional_interest_amount > 0
+    AND EXISTS (
+        SELECT 1
+        FROM medical_history
+        WHERE insured_id = claims.insured_id
+        AND diagnosis_code = '간질발작'
+        GROUP BY insured_id
+        HAVING COUNT(*) >= 6 AND SUM(CASE WHEN treatment_date >= DATE('now', '-6 months') THEN 1 ELSE 0 END) >= 8
+    )
+);",SELECT AVG(i.insured_age) FROM claims c JOIN insured i ON c.insured_id = i.insured_id WHERE c.disability_type = '심한간질발작' AND c.claim_type = '장해보험금' AND c.claim_status = '지급완료',0,1,1,2243.6,,
+UW029,장해리스크,moderate,high,2,text2sql,"SELECT AVG(insured_age) AS average_age
+FROM insured
+WHERE insured_id IN (
+    SELECT DISTINCT insured_id
+    FROM claims
+    WHERE claim_type = '장해보험금'
+    AND claim_status = '지급완료'
+    AND insured_id IN (
+        SELECT insured_id
+        FROM medical_history
+        WHERE diagnosis_code = '간질발작'
+        GROUP BY insured_id
+        HAVING COUNT(*) >= 6 AND SUM(CASE WHEN strftime('%Y', treatment_date) = strftime('%Y', 'now') THEN 1 ELSE 0 END) >= 8
+    )
+);",SELECT AVG(i.insured_age) FROM claims c JOIN insured i ON c.insured_id = i.insured_id WHERE c.disability_type = '심한간질발작' AND c.claim_type = '장해보험금' AND c.claim_status = '지급완료',0,1,1,1965.62,,
+UW029,장해리스크,moderate,high,3,text2sql,"SELECT AVG(insured_age) AS average_age
+FROM insured
+WHERE insured_id IN (
+    SELECT insured_id
+    FROM claims
+    WHERE claim_type = '장해보험금'
+    AND additional_interest_amount > 0
+    AND EXISTS (
+        SELECT 1
+        FROM medical_history
+        WHERE insured_id = claims.insured_id
+        AND diagnosis_code = '간질발작'
+        GROUP BY insured_id
+        HAVING COUNT(*) >= 6
+    )
+);",SELECT AVG(i.insured_age) FROM claims c JOIN insured i ON c.insured_id = i.insured_id WHERE c.disability_type = '심한간질발작' AND c.claim_type = '장해보험금' AND c.claim_status = '지급완료',0,1,1,1940.28,,
+UW030,장해리스크,challenging,high,1,text2sql,"SELECT COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.disability_payment_rate IS NOT NULL
+AND c.insurance_period_years < 10
+AND cl.claim_status IN ('지급완료', '심사중');","SELECT CASE WHEN pr.insurance_period_years >= 10 THEN '10년이상' ELSE '10년미만' END AS period_group, COUNT(*) AS cnt FROM contracts ct JOIN products pr ON ct.product_id = pr.product_id WHERE ct.disability_rate_revised = 1 GROUP BY period_group",0,0,0,1433.42,,pred_sql 오류: no such column: c.insurance_period_years
+UW030,장해리스크,challenging,high,2,text2sql,"SELECT COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.disability_payment_rate IS NOT NULL
+AND c.insurance_period_years < 10
+AND cl.claim_status IN ('지급완료', '심사중');","SELECT CASE WHEN pr.insurance_period_years >= 10 THEN '10년이상' ELSE '10년미만' END AS period_group, COUNT(*) AS cnt FROM contracts ct JOIN products pr ON ct.product_id = pr.product_id WHERE ct.disability_rate_revised = 1 GROUP BY period_group",0,0,0,1463.3,,pred_sql 오류: no such column: c.insurance_period_years
+UW030,장해리스크,challenging,high,3,text2sql,"SELECT COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.disability_payment_rate IS NOT NULL
+AND c.insurance_period_years < 10
+AND cl.claim_status IN ('지급완료', '심사중');","SELECT CASE WHEN pr.insurance_period_years >= 10 THEN '10년이상' ELSE '10년미만' END AS period_group, COUNT(*) AS cnt FROM contracts ct JOIN products pr ON ct.product_id = pr.product_id WHERE ct.disability_rate_revised = 1 GROUP BY period_group",0,0,0,1312.66,,pred_sql 오류: no such column: c.insurance_period_years
+UW031,보험금지급,moderate,high,1,text2sql,"SELECT COUNT(*) AS denied_claims_count
+FROM claims
+WHERE claim_status = '지급거절' AND claim_denial_reason IS NOT NULL;",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '수익자고의피해' AND claim_status = '지급거절',0,1,1,962.14,,
+UW031,보험금지급,moderate,high,2,text2sql,"SELECT COUNT(*) AS denied_claims_count
+FROM claims
+WHERE claim_status = '지급거절' AND claim_denial_reason IS NOT NULL;",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '수익자고의피해' AND claim_status = '지급거절',0,1,1,908.91,,
+UW031,보험금지급,moderate,high,3,text2sql,"SELECT COUNT(*) AS denied_claims_count
+FROM claims
+WHERE claim_status = '지급거절' AND claim_denial_reason IS NOT NULL;",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '수익자고의피해' AND claim_status = '지급거절',0,1,1,979.77,,
+UW032,계약관리,moderate,medium,1,text2sql,"SELECT strftime('%Y-%m', withdrawal_date) AS month, COUNT(*) AS count
+FROM contract_withdrawals
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM loan_deductions
+    WHERE deduction_type = '해지환급금차감'
+)
+GROUP BY month
+ORDER BY month;","SELECT STRFTIME('%Y-%m', deduction_date) AS month, COUNT(*) AS cnt FROM loan_deductions WHERE deduction_type = '해지환급금차감' GROUP BY STRFTIME('%Y-%m', deduction_date) ORDER BY month",0,0,15,4412.92,,
+UW032,계약관리,moderate,medium,2,text2sql,"SELECT strftime('%Y-%m', withdrawal_date) AS month, COUNT(*) AS count
+FROM contract_withdrawals
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM loan_deductions
+    WHERE deduction_type = '해지환급금차감'
+)
+GROUP BY month
+ORDER BY month;","SELECT STRFTIME('%Y-%m', deduction_date) AS month, COUNT(*) AS cnt FROM loan_deductions WHERE deduction_type = '해지환급금차감' GROUP BY STRFTIME('%Y-%m', deduction_date) ORDER BY month",0,0,15,1333.47,,
+UW032,계약관리,moderate,medium,3,text2sql,"SELECT strftime('%Y-%m', withdrawal_date) AS month, COUNT(*) AS count
+FROM contract_withdrawals
+WHERE contract_id IN (
+    SELECT contract_id
+    FROM loan_deductions
+    WHERE deduction_type = '해지환급금차감'
+)
+GROUP BY month
+ORDER BY month;","SELECT STRFTIME('%Y-%m', deduction_date) AS month, COUNT(*) AS cnt FROM loan_deductions WHERE deduction_type = '해지환급금차감' GROUP BY STRFTIME('%Y-%m', deduction_date) ORDER BY month",0,0,15,5124.49,,
+UW033,보험금지급,moderate,medium,1,text2sql,"SELECT 
+    strftime('%Y', claim_date) AS year,
+    COUNT(*) AS claim_count,
+    SUM(paid_amount) AS total_amount,
+    AVG(paid_amount) AS average_amount
+FROM 
+    claims
+WHERE 
+    claim_type = '사망보험금' AND 
+    strftime('%Y', claim_date) >= strftime('%Y', 'now', '-5 years')
+GROUP BY 
+    year
+ORDER BY 
+    year DESC;","SELECT STRFTIME('%Y', actual_payment_date) AS year, COUNT(*) AS cnt, SUM(paid_amount) AS total, AVG(paid_amount) AS avg_amount FROM claims WHERE claim_type = '사망보험금' AND actual_payment_date >= DATE('now', '-5 years') GROUP BY STRFTIME('%Y', actual_payment_date) ORDER BY year",0,3,3,5215.05,,
+UW033,보험금지급,moderate,medium,2,text2sql,"SELECT 
+    strftime('%Y', claim_date) AS year,
+    COUNT(*) AS claim_count,
+    SUM(paid_amount) AS total_paid_amount,
+    AVG(paid_amount) AS average_paid_amount
+FROM 
+    claims
+WHERE 
+    claim_type = '사망보험금' AND 
+    strftime('%Y', claim_date) >= strftime('%Y', 'now', '-5 years')
+GROUP BY 
+    year
+ORDER BY 
+    year DESC;","SELECT STRFTIME('%Y', actual_payment_date) AS year, COUNT(*) AS cnt, SUM(paid_amount) AS total, AVG(paid_amount) AS avg_amount FROM claims WHERE claim_type = '사망보험금' AND actual_payment_date >= DATE('now', '-5 years') GROUP BY STRFTIME('%Y', actual_payment_date) ORDER BY year",0,3,3,2815.36,,
+UW033,보험금지급,moderate,medium,3,text2sql,"SELECT 
+    strftime('%Y', claim_date) AS year,
+    COUNT(*) AS claim_count,
+    SUM(paid_amount) AS total_amount,
+    AVG(paid_amount) AS average_amount
+FROM 
+    claims
+WHERE 
+    claim_type = '사망보험금' AND 
+    strftime('%Y', claim_date) >= strftime('%Y', 'now', '-5 years')
+GROUP BY 
+    year
+ORDER BY 
+    year DESC;","SELECT STRFTIME('%Y', actual_payment_date) AS year, COUNT(*) AS cnt, SUM(paid_amount) AS total, AVG(paid_amount) AS avg_amount FROM claims WHERE claim_type = '사망보험금' AND actual_payment_date >= DATE('now', '-5 years') GROUP BY STRFTIME('%Y', actual_payment_date) ORDER BY year",0,3,3,3694.9,,
+UW034,보험금지급,moderate,high,1,text2sql,"SELECT COUNT(*) AS claim_count, AVG(missing_period_days) AS average_missing_period
+FROM claims
+WHERE death_cause_type = '실종선고';","SELECT COUNT(*) AS cnt, AVG(missing_period_days) AS avg_missing_days FROM claims WHERE death_cause_type = '실종선고' AND claim_type = '사망보험금'",1,1,1,961.59,,
+UW034,보험금지급,moderate,high,2,text2sql,"SELECT COUNT(*) AS claim_count, AVG(missing_period_days) AS average_missing_period
+FROM claims
+WHERE death_cause_type = '실종선고';","SELECT COUNT(*) AS cnt, AVG(missing_period_days) AS avg_missing_days FROM claims WHERE death_cause_type = '실종선고' AND claim_type = '사망보험금'",1,1,1,1367.67,,
+UW034,보험금지급,moderate,high,3,text2sql,"SELECT COUNT(*) AS claim_count, AVG(missing_period_days) AS average_missing_period
+FROM claims
+WHERE death_cause_type = '실종선고';","SELECT COUNT(*) AS cnt, AVG(missing_period_days) AS avg_missing_days FROM claims WHERE death_cause_type = '실종선고' AND claim_type = '사망보험금'",1,1,1,1144.99,,
+UW035,계약관리,simple,low,1,text2sql,"SELECT 
+    COUNT(*) AS total_withdrawals,
+    SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) AS withdrawals_within_15_days,
+    (SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) * 1.0 / COUNT(*)) * 100 AS withdrawal_rate_within_15_days
+FROM 
+    contract_withdrawals;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) AS INTEGER) <= 15 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contract_withdrawals",0,1,1,3194.51,,
+UW035,계약관리,simple,low,2,text2sql,"SELECT 
+    COUNT(*) AS total_withdrawals,
+    SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) AS withdrawals_within_15_days,
+    (SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) * 1.0 / COUNT(*)) * 100 AS withdrawal_rate
+FROM 
+    contract_withdrawals;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) AS INTEGER) <= 15 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contract_withdrawals",0,1,1,2230.16,,
+UW035,계약관리,simple,low,3,text2sql,"SELECT 
+    COUNT(*) AS total_withdrawals,
+    SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) AS withdrawals_within_15_days,
+    (SUM(CASE WHEN JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) <= 15 THEN 1 ELSE 0 END) * 1.0 / COUNT(*)) * 100 AS withdrawal_rate_within_15_days
+FROM 
+    contract_withdrawals;","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) AS INTEGER) <= 15 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contract_withdrawals",0,1,1,2090.42,,
+UW036,계약관리,simple,low,1,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE contract_status = 'terminated'
+AND termination_reason IN ('약관 미교부', '중요내용 미설명')
+AND DATE(contract_date, '+3 months') >= DATE('now');",SELECT COUNT(*) FROM contracts WHERE cancellation_reason = '약관미교부또는미설명' AND CAST(JULIANDAY(termination_date) - JULIANDAY(contract_date) AS INTEGER) <= 90,1,1,1,1411.54,,
+UW036,계약관리,simple,low,2,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE contract_status = 'terminated'
+AND termination_reason IN ('약관 미교부', '중요내용 미설명')
+AND DATE(contract_date, '+3 months') >= DATE('now');",SELECT COUNT(*) FROM contracts WHERE cancellation_reason = '약관미교부또는미설명' AND CAST(JULIANDAY(termination_date) - JULIANDAY(contract_date) AS INTEGER) <= 90,1,1,1,1288.79,,
+UW036,계약관리,simple,low,3,text2sql,"SELECT COUNT(*) AS cancellation_count
+FROM contracts
+WHERE contract_status = 'terminated'
+AND termination_reason IN ('약관 미교부', '중요내용 미설명')
+AND DATE(contract_date, '+3 months') >= DATE('now');",SELECT COUNT(*) FROM contracts WHERE cancellation_reason = '약관미교부또는미설명' AND CAST(JULIANDAY(termination_date) - JULIANDAY(contract_date) AS INTEGER) <= 90,1,1,1,1384.51,,
+UW037,보험금지급,moderate,medium,1,text2sql,"SELECT COUNT(*) AS total_provisional_payments, SUM(provisional_payment_amount) AS total_amount
+FROM claims
+WHERE provisional_payment_made = 1 AND provisional_payment_amount <= paid_amount * 0.5;","SELECT COUNT(*) AS cnt, SUM(provisional_payment_amount) AS total FROM claims WHERE provisional_payment_made = 1",1,1,1,1414.55,,
+UW037,보험금지급,moderate,medium,2,text2sql,"SELECT COUNT(*) AS total_provisional_payments, SUM(provisional_payment_amount) AS total_amount
+FROM claims
+WHERE provisional_payment_made = 1 AND provisional_payment_amount <= paid_amount * 0.5;","SELECT COUNT(*) AS cnt, SUM(provisional_payment_amount) AS total FROM claims WHERE provisional_payment_made = 1",1,1,1,1296.88,,
+UW037,보험금지급,moderate,medium,3,text2sql,"SELECT COUNT(*) AS total_provisional_payments, SUM(provisional_payment_amount) AS total_amount
+FROM claims
+WHERE provisional_payment_amount <= paid_amount * 0.5;","SELECT COUNT(*) AS cnt, SUM(provisional_payment_amount) AS total FROM claims WHERE provisional_payment_made = 1",0,1,1,1181.34,,
+UW038,계약관리,moderate,medium,1,text2sql,"SELECT COUNT(*) AS contract_count, AVG(corrected_premium) AS average_corrected_amount
+FROM contracts
+WHERE age_correction_applied = 1;","SELECT COUNT(*) AS cnt, AVG(ABS(corrected_premium - original_premium)) AS avg_correction FROM contracts WHERE age_correction_applied = 1",0,1,1,2635.5,,
+UW038,계약관리,moderate,medium,2,text2sql,"SELECT COUNT(*) AS contract_count, AVG(corrected_premium) AS average_corrected_amount
+FROM contracts
+WHERE age_correction_applied = 1;","SELECT COUNT(*) AS cnt, AVG(ABS(corrected_premium - original_premium)) AS avg_correction FROM contracts WHERE age_correction_applied = 1",0,1,1,1594.61,,
+UW038,계약관리,moderate,medium,3,text2sql,"SELECT COUNT(*) AS contract_count, AVG(corrected_premium) AS average_corrected_amount
+FROM contracts
+WHERE age_correction_applied = 1;","SELECT COUNT(*) AS cnt, AVG(ABS(corrected_premium - original_premium)) AS avg_correction FROM contracts WHERE age_correction_applied = 1",0,1,1,1681.41,,
+UW039,계약관리,moderate,medium,1,text2sql,"SELECT COUNT(*) 
+FROM contract_revivals 
+WHERE revival_reason = '특별부활' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '강제집행'
+);","SELECT COUNT(*) FROM contract_revivals WHERE revival_reason = '특별부활' AND original_termination_reason IN ('강제집행', '담보권실행', '체납처분')",0,1,1,1490.21,,
+UW039,계약관리,moderate,medium,2,text2sql,"SELECT COUNT(*) 
+FROM contract_revivals 
+WHERE revival_reason = '특별부활' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '강제집행'
+);","SELECT COUNT(*) FROM contract_revivals WHERE revival_reason = '특별부활' AND original_termination_reason IN ('강제집행', '담보권실행', '체납처분')",0,1,1,1144.91,,
+UW039,계약관리,moderate,medium,3,text2sql,"SELECT COUNT(*) 
+FROM contract_revivals 
+WHERE revival_reason = '특별부활' 
+AND contract_id IN (
+    SELECT contract_id 
+    FROM contracts 
+    WHERE termination_reason = '강제집행'
+);","SELECT COUNT(*) FROM contract_revivals WHERE revival_reason = '특별부활' AND original_termination_reason IN ('강제집행', '담보권실행', '체납처분')",0,1,1,1324.71,,
+UW040,계약관리,moderate,low,1,text2sql,"SELECT COUNT(*) 
+FROM contract_changes 
+WHERE change_type = '보험종목변경' 
+AND change_status = '거절' 
+AND JULIANDAY(change_request_date) < JULIANDAY(first_premium_payment_date) - 365;",SELECT COUNT(*) FROM contract_changes WHERE change_type = '보험종목변경' AND change_status = '거절' AND CAST(JULIANDAY(change_request_date) - JULIANDAY(first_premium_payment_date) AS INTEGER) < 365,0,1,1,1208.95,,
+UW040,계약관리,moderate,low,2,text2sql,"SELECT COUNT(*) 
+FROM contract_changes 
+WHERE change_type = '보험종목변경' 
+AND change_status = '거절' 
+AND JULIANDAY(change_request_date) < JULIANDAY(first_premium_payment_date) - 365;",SELECT COUNT(*) FROM contract_changes WHERE change_type = '보험종목변경' AND change_status = '거절' AND CAST(JULIANDAY(change_request_date) - JULIANDAY(first_premium_payment_date) AS INTEGER) < 365,0,1,1,2008.7,,
+UW040,계약관리,moderate,low,3,text2sql,"SELECT COUNT(*) 
+FROM contract_changes 
+WHERE change_type = '보험종목변경' 
+AND change_status = '거절' 
+AND JULIANDAY(change_request_date) < JULIANDAY(first_premium_payment_date) - 365;",SELECT COUNT(*) FROM contract_changes WHERE change_type = '보험종목변경' AND change_status = '거절' AND CAST(JULIANDAY(change_request_date) - JULIANDAY(first_premium_payment_date) AS INTEGER) < 365,0,1,1,3710.67,,
+UW041,계약관리,moderate,low,1,text2sql,"SELECT COUNT(*) AS contract_count, AVG(julianday(arrear_payment_date) - julianday(notice_date)) AS average_days_to_payment
+FROM premium_notices
+WHERE paid_within_notice_period = 1 AND 
+      julianday(arrear_payment_date) - julianday(notice_date) <= 14;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER)) AS avg_days FROM premium_notices WHERE paid_within_notice_period = 1 AND CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER) <= 14",1,1,1,2134.02,,
+UW041,계약관리,moderate,low,2,text2sql,"SELECT COUNT(*) AS contract_count, AVG(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date)) AS average_days_to_payment
+FROM premium_notices
+WHERE paid_within_notice_period = 1 AND 
+      JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) <= 14;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER)) AS avg_days FROM premium_notices WHERE paid_within_notice_period = 1 AND CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER) <= 14",1,1,1,1358.55,,
+UW041,계약관리,moderate,low,3,text2sql,"SELECT COUNT(*) AS contract_count, AVG(julianday(arrear_payment_date) - julianday(notice_date)) AS average_days_to_payment
+FROM premium_notices
+WHERE paid_within_notice_period = 1 AND 
+      julianday(arrear_payment_date) - julianday(notice_date) <= 14;","SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER)) AS avg_days FROM premium_notices WHERE paid_within_notice_period = 1 AND CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER) <= 14",1,1,1,1495.51,,
+UW042,보험금지급,challenging,low,1,text2sql,"SELECT 
+    SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_within_3_business_days_ratio,
+    SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_after_10_business_days_ratio
+FROM claims;","SELECT ROUND(SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS within_3_days_pct, ROUND(SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS over_10_days_pct FROM claims WHERE claim_status = '지급완료'",0,1,1,2024.33,,
+UW042,보험금지급,challenging,low,2,text2sql,"SELECT 
+    SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_within_3_business_days_ratio,
+    SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_after_10_business_days_ratio
+FROM claims;","SELECT ROUND(SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS within_3_days_pct, ROUND(SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS over_10_days_pct FROM claims WHERE claim_status = '지급완료'",0,1,1,1691.5,,
+UW042,보험금지급,challenging,low,3,text2sql,"SELECT 
+    SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_within_3_business_days_ratio,
+    SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS paid_after_10_business_days_ratio
+FROM claims;","SELECT ROUND(SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS within_3_days_pct, ROUND(SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS over_10_days_pct FROM claims WHERE claim_status = '지급완료'",0,1,1,1601.55,,
+UW043,보험금지급,challenging,high,1,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_denial_reason = '호흡장해' AND claim_status = '지급거절';",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '재해분류제외' AND icd_code BETWEEN 'W75' AND 'W84' AND denial_detail = '질병에의한호흡장해' AND claim_status = '지급거절',1,1,1,920.88,,
+UW043,보험금지급,challenging,high,2,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_denial_reason = '호흡장해' AND claim_status = '지급거절';",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '재해분류제외' AND icd_code BETWEEN 'W75' AND 'W84' AND denial_detail = '질병에의한호흡장해' AND claim_status = '지급거절',1,1,1,1027.59,,
+UW043,보험금지급,challenging,high,3,text2sql,"SELECT COUNT(*) 
+FROM claims 
+WHERE claim_status = '지급거절' 
+AND claim_type = '호흡장해';",SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '재해분류제외' AND icd_code BETWEEN 'W75' AND 'W84' AND denial_detail = '질병에의한호흡장해' AND claim_status = '지급거절',1,1,1,1274.36,,
+UW044,보험금지급,challenging,medium,1,text2sql,"SELECT SUM(additional_interest_amount) AS total_additional_interest
+FROM claims
+WHERE payment_method = '분할지급';",SELECT SUM(interest_added_amount) FROM claims WHERE payment_method = '분할지급' AND interest_added_amount IS NOT NULL,0,1,1,1046.12,,
+UW044,보험금지급,challenging,medium,2,text2sql,"SELECT SUM(additional_interest_amount) AS total_additional_interest
+FROM claims
+WHERE payment_method = '분할지급';",SELECT SUM(interest_added_amount) FROM claims WHERE payment_method = '분할지급' AND interest_added_amount IS NOT NULL,0,1,1,1173.93,,
+UW044,보험금지급,challenging,medium,3,text2sql,"SELECT SUM(additional_interest_amount) AS total_additional_interest
+FROM claims
+WHERE payment_method = '분할지급';",SELECT SUM(interest_added_amount) FROM claims WHERE payment_method = '분할지급' AND interest_added_amount IS NOT NULL,0,1,1,926.0,,
+UW045,장해리스크,challenging,high,1,text2sql,"SELECT 
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) <= 180 THEN 1 END) AS within_6_months,
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) > 180 THEN 1 END) AS after_6_months
+FROM medical_history
+WHERE diagnosis_code = '뇌졸중';","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) <= 180 THEN 1 END) * 100.0 / COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) > 180 THEN 1 END), 2) AS ratio FROM claims WHERE primary_diagnosis IN ('뇌졸중', '뇌손상') AND claim_type = '장해보험금'",0,0,1,3989.91,,pred_sql 오류: no such column: disability_assessment_date
+UW045,장해리스크,challenging,high,2,text2sql,"SELECT 
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) <= 180 THEN 1 END) AS within_6_months,
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) > 180 THEN 1 END) AS after_6_months
+FROM 
+    medical_history
+WHERE 
+    diagnosis_code = '뇌졸중';","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) <= 180 THEN 1 END) * 100.0 / COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) > 180 THEN 1 END), 2) AS ratio FROM claims WHERE primary_diagnosis IN ('뇌졸중', '뇌손상') AND claim_type = '장해보험금'",0,0,1,2051.22,,pred_sql 오류: no such column: disability_assessment_date
+UW045,장해리스크,challenging,high,3,text2sql,"SELECT 
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) <= 180 THEN 1 END) AS within_6_months,
+    COUNT(CASE WHEN disability_assessment_date IS NOT NULL AND JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) > 180 THEN 1 END) AS after_6_months
+FROM 
+    medical_history
+WHERE 
+    diagnosis_code = '뇌졸중';","SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) <= 180 THEN 1 END) * 100.0 / COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) > 180 THEN 1 END), 2) AS ratio FROM claims WHERE primary_diagnosis IN ('뇌졸중', '뇌손상') AND claim_type = '장해보험금'",0,0,1,2127.13,,pred_sql 오류: no such column: disability_assessment_date
+UW046,계약심사,moderate,low,1,text2sql,"SELECT COUNT(*) AS valid_contracts_count
+FROM contracts
+WHERE insured_age >= 40
+  AND contract_status = 'active'
+  AND total_paid_premium < sum_insured;",SELECT COUNT(*) AS active_savings_policy_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'savings' AND c.contract_status = 'active' AND pr.reference_age = 40 AND pr.payment_type = 'full_term' AND pr.payment_cycle = 'monthly' AND pr.survival_benefit_total > pr.expected_total_premium,0,0,1,1646.51,,pred_sql 오류: no such column: insured_age
+UW046,계약심사,moderate,low,2,text2sql,"SELECT COUNT(*) AS valid_contracts_count
+FROM contracts
+WHERE insured_age >= 40
+  AND contract_status = 'active'
+  AND total_paid_premium < sum_insured;",SELECT COUNT(*) AS active_savings_policy_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'savings' AND c.contract_status = 'active' AND pr.reference_age = 40 AND pr.payment_type = 'full_term' AND pr.payment_cycle = 'monthly' AND pr.survival_benefit_total > pr.expected_total_premium,0,0,1,1076.35,,pred_sql 오류: no such column: insured_age
+UW046,계약심사,moderate,low,3,text2sql,"SELECT COUNT(*) AS valid_contracts_count
+FROM contracts
+WHERE contract_status = 'active'
+AND insured_age >= 40
+AND payment_type = 'full_term'
+AND payment_cycle = 'monthly'
+AND sum_insured > total_paid_premium;",SELECT COUNT(*) AS active_savings_policy_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'savings' AND c.contract_status = 'active' AND pr.reference_age = 40 AND pr.payment_type = 'full_term' AND pr.payment_cycle = 'monthly' AND pr.survival_benefit_total > pr.expected_total_premium,0,0,1,1372.17,,pred_sql 오류: no such column: insured_age
+UW047,보험료산출,moderate,low,1,text2sql,"SELECT 
+    p.product_type,
+    COUNT(c.contract_id) AS new_contract_count,
+    AVG(c.monthly_premium) AS average_premium
+FROM 
+    contracts c
+JOIN 
+    products p ON c.product_id = p.product_id
+WHERE 
+    p.insurance_type = 'life'
+GROUP BY 
+    p.product_type;","SELECT CASE WHEN pr.survival_benefit_total = 0 THEN 'pure_protection' ELSE 'other_protection' END AS protection_type, COUNT(c.contract_id) AS new_contract_count, ROUND(AVG(c.monthly_premium), 0) AS avg_premium FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date >= DATE('now', '-1 year') GROUP BY protection_type",0,8,0,1460.36,,
+UW047,보험료산출,moderate,low,2,text2sql,"SELECT 
+    p.product_type,
+    COUNT(c.contract_id) AS new_contract_count,
+    AVG(c.monthly_premium) AS average_premium
+FROM 
+    contracts c
+JOIN 
+    products p ON c.product_id = p.product_id
+WHERE 
+    p.insurance_type = 'life'
+GROUP BY 
+    p.product_type;","SELECT CASE WHEN pr.survival_benefit_total = 0 THEN 'pure_protection' ELSE 'other_protection' END AS protection_type, COUNT(c.contract_id) AS new_contract_count, ROUND(AVG(c.monthly_premium), 0) AS avg_premium FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date >= DATE('now', '-1 year') GROUP BY protection_type",0,8,0,1614.06,,
+UW047,보험료산출,moderate,low,3,text2sql,"SELECT 
+    p.product_type,
+    COUNT(c.contract_id) AS new_contract_count,
+    AVG(c.monthly_premium) AS average_premium
+FROM 
+    contracts c
+JOIN 
+    products p ON c.product_id = p.product_id
+WHERE 
+    p.insurance_type = 'life'
+GROUP BY 
+    p.product_type;","SELECT CASE WHEN pr.survival_benefit_total = 0 THEN 'pure_protection' ELSE 'other_protection' END AS protection_type, COUNT(c.contract_id) AS new_contract_count, ROUND(AVG(c.monthly_premium), 0) AS avg_premium FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date >= DATE('now', '-1 year') GROUP BY protection_type",0,8,0,1437.51,,
+UW048,계약심사,moderate,medium,1,text2sql,"SELECT *
+FROM contracts
+WHERE insurance_period = 'whole_life' AND death_benefit < total_paid_premium;","SELECT c.contract_id, c.insured_id, c.death_benefit, c.total_paid_premium, c.contract_status FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.insurance_period = 'whole_life' AND c.death_benefit < c.total_paid_premium AND c.contract_status = 'active'",0,0,11,989.27,,pred_sql 오류: no such column: insurance_period
+UW048,계약심사,moderate,medium,2,text2sql,"SELECT *
+FROM contracts
+WHERE insurance_period = 'whole_life' AND death_benefit < total_paid_premium;","SELECT c.contract_id, c.insured_id, c.death_benefit, c.total_paid_premium, c.contract_status FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.insurance_period = 'whole_life' AND c.death_benefit < c.total_paid_premium AND c.contract_status = 'active'",0,0,11,1043.06,,pred_sql 오류: no such column: insurance_period
+UW048,계약심사,moderate,medium,3,text2sql,"SELECT *
+FROM contracts
+WHERE insurance_period = 'whole_life' AND death_benefit < total_paid_premium;","SELECT c.contract_id, c.insured_id, c.death_benefit, c.total_paid_premium, c.contract_status FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.insurance_period = 'whole_life' AND c.death_benefit < c.total_paid_premium AND c.contract_status = 'active'",0,0,11,1061.65,,pred_sql 오류: no such column: insurance_period
+UW049,보험료산출,moderate,medium,1,text2sql,"SELECT c.policyholder_id, c.remaining_coverage_reserve
+FROM contracts c
+JOIN declared_rate_info d ON c.product_id = d.product_id
+WHERE d.rate_year = 7
+AND c.remaining_coverage_reserve < c.total_paid_premium;","SELECT c.contract_id, c.policyholder_id, c.insured_id, c.reserve_amount_at_7yr, c.expected_total_premium_7yr FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND c.reserve_amount_at_7yr < c.expected_total_premium_7yr AND c.contract_status = 'active'",1,0,0,1404.79,,
+UW049,보험료산출,moderate,medium,2,text2sql,"SELECT c.policyholder_id, c.remaining_coverage_reserve
+FROM contracts c
+JOIN declared_rate_info d ON c.product_id = d.product_id
+WHERE d.rate_year = 7
+AND c.remaining_coverage_reserve < c.total_paid_premium;","SELECT c.contract_id, c.policyholder_id, c.insured_id, c.reserve_amount_at_7yr, c.expected_total_premium_7yr FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND c.reserve_amount_at_7yr < c.expected_total_premium_7yr AND c.contract_status = 'active'",1,0,0,1201.17,,
+UW049,보험료산출,moderate,medium,3,text2sql,"SELECT policyholder_id, remaining_coverage_reserve
+FROM contracts
+WHERE contract_type = '저축성보험'
+AND remaining_coverage_reserve < total_paid_premium
+AND payment_year_elapsed = 7;","SELECT c.contract_id, c.policyholder_id, c.insured_id, c.reserve_amount_at_7yr, c.expected_total_premium_7yr FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND c.reserve_amount_at_7yr < c.expected_total_premium_7yr AND c.contract_status = 'active'",1,0,0,1340.73,,
+UW050,계약심사,moderate,medium,1,text2sql,"SELECT COUNT(*) 
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE ud.risk_surcharge_rate > 30 
+AND p.insurance_period_years > 15;",SELECT COUNT(c.contract_id) AS surcharge_over_30_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND pr.insurance_period_years > 15 AND ud.risk_surcharge_rate > 0.30 AND c.contract_status = 'active',0,1,1,1296.25,,
+UW050,계약심사,moderate,medium,2,text2sql,"SELECT COUNT(*) 
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE ud.risk_surcharge_rate > 30 
+AND p.insurance_period_years > 15;",SELECT COUNT(c.contract_id) AS surcharge_over_30_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND pr.insurance_period_years > 15 AND ud.risk_surcharge_rate > 0.30 AND c.contract_status = 'active',0,1,1,1235.83,,
+UW050,계약심사,moderate,medium,3,text2sql,"SELECT COUNT(*) 
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE ud.risk_surcharge_rate > 30 
+AND p.insurance_period_years > 15;",SELECT COUNT(c.contract_id) AS surcharge_over_30_count FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND pr.insurance_period_years > 15 AND ud.risk_surcharge_rate > 0.30 AND c.contract_status = 'active',0,1,1,1241.73,,
+UW051,보험금지급,challenging,medium,1,text2sql,"SELECT COUNT(DISTINCT c.insured_id) AS insured_count, 
+       SUM(c.paid_amount) AS total_settlement_amount
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+WHERE ud.decision_type = '승낙' 
+  AND c.coverage_type = '제3보험' 
+  AND c.total_paid_premium < (c.total_paid_premium * (1 + ud.premium_surcharge_rate / 100))
+  AND ud.premium_surcharge_rate = 20;","SELECT COUNT(DISTINCT c.insured_id) AS insured_count, SUM((ud.risk_premium_before_surcharge - COALESCE(cl.paid_amount, 0)) * 0.5) AS estimated_refund_total FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id LEFT JOIN claims cl ON cl.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND ud.extra_surcharge_rate = 0.20 AND COALESCE(cl.paid_amount, 0) < ud.risk_premium_before_surcharge AND c.contract_status IN ('active', 'expired')",0,0,1,2057.0,,pred_sql 오류: no such column: c.paid_amount
+UW051,보험금지급,challenging,medium,2,text2sql,"SELECT COUNT(DISTINCT c.insured_id) AS insured_count, 
+       SUM(c.paid_amount) AS total_settlement_amount
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+WHERE ud.decision_type = '승낙' 
+  AND c.coverage_type = '제3보험' 
+  AND c.total_paid_premium < (c.total_paid_premium * (1 + ud.premium_surcharge_rate / 100))
+  AND ud.premium_surcharge_rate = 20;","SELECT COUNT(DISTINCT c.insured_id) AS insured_count, SUM((ud.risk_premium_before_surcharge - COALESCE(cl.paid_amount, 0)) * 0.5) AS estimated_refund_total FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id LEFT JOIN claims cl ON cl.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND ud.extra_surcharge_rate = 0.20 AND COALESCE(cl.paid_amount, 0) < ud.risk_premium_before_surcharge AND c.contract_status IN ('active', 'expired')",0,0,1,1800.78,,pred_sql 오류: no such column: c.paid_amount
+UW051,보험금지급,challenging,medium,3,text2sql,"SELECT COUNT(DISTINCT c.insured_id) AS insured_count, 
+       SUM(c.paid_amount) AS total_settlement_amount
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+WHERE ud.decision_type = '승낙' 
+  AND ud.risk_surcharge_rate = 0.2 
+  AND c.paid_amount < ud.risk_premium_before_surcharge;","SELECT COUNT(DISTINCT c.insured_id) AS insured_count, SUM((ud.risk_premium_before_surcharge - COALESCE(cl.paid_amount, 0)) * 0.5) AS estimated_refund_total FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN underwriting_decisions ud ON ud.contract_id = c.contract_id LEFT JOIN claims cl ON cl.contract_id = c.contract_id WHERE pr.product_category = 'third_insurance' AND ud.extra_surcharge_rate = 0.20 AND COALESCE(cl.paid_amount, 0) < ud.risk_premium_before_surcharge AND c.contract_status IN ('active', 'expired')",0,0,1,2227.73,,pred_sql 오류: no such column: c.paid_amount
+UW052,보험료산출,moderate,low,1,text2sql,"SELECT p.product_name, 
+       AVG(c.contract_cost_index) AS average_contract_cost_index
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE c.contract_type = '보장' 
+  AND c.contract_conclusion_cost > c.standard_surrender_charge
+GROUP BY p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(pr.contract_cost_index), 4) AS avg_contract_cost_index FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND pr.contract_conclusion_cost > pr.standard_surrender_charge AND c.contract_status = 'active' GROUP BY pr.product_name ORDER BY contract_count DESC",0,0,2,1700.59,,pred_sql 오류: no such column: c.contract_cost_index
+UW052,보험료산출,moderate,low,2,text2sql,"SELECT p.product_name, 
+       AVG(c.contract_cost_index) AS average_contract_cost_index
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE c.contract_type = '보장' 
+  AND c.contract_conclusion_cost > c.standard_surrender_charge
+GROUP BY p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(pr.contract_cost_index), 4) AS avg_contract_cost_index FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND pr.contract_conclusion_cost > pr.standard_surrender_charge AND c.contract_status = 'active' GROUP BY pr.product_name ORDER BY contract_count DESC",0,0,2,1519.28,,pred_sql 오류: no such column: c.contract_cost_index
+UW052,보험료산출,moderate,low,3,text2sql,"SELECT p.product_name, 
+       AVG(c.contract_cost_index) AS average_contract_cost_index
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE c.contract_type = '보장' 
+  AND c.contract_conclusion_cost > c.standard_surrender_charge
+GROUP BY p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(pr.contract_cost_index), 4) AS avg_contract_cost_index FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND pr.contract_conclusion_cost > pr.standard_surrender_charge AND c.contract_status = 'active' GROUP BY pr.product_name ORDER BY contract_count DESC",0,0,2,1821.15,,pred_sql 오류: no such column: c.contract_cost_index
+UW053,계약관리,challenging,medium,1,text2sql,"SELECT c.contract_id
+FROM contracts c
+JOIN commission_payments cp ON c.contract_id = cp.contract_id
+WHERE c.contract_status = 'terminated'
+AND JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) <= 365
+AND cp.total_commission_paid > c.total_paid_premium;","SELECT c.contract_id, c.policyholder_id, c.termination_date, c.total_paid_premium, cp.total_commission_paid, (cp.total_commission_paid - c.total_paid_premium) AS excess_commission FROM contracts c JOIN commission_payments cp ON cp.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_status = 'terminated' AND CAST(JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) AS INTEGER) <= 365 AND cp.total_commission_paid > c.total_paid_premium ORDER BY excess_commission DESC",1,0,0,1681.46,,
+UW053,계약관리,challenging,medium,2,text2sql,"SELECT c.contract_id, c.product_id, c.insured_id, c.total_paid_premium, c.annual_premium, cp.total_commission_paid
+FROM contracts c
+JOIN commission_payments cp ON c.contract_id = cp.contract_id
+WHERE c.contract_status = 'terminated'
+AND JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) <= 365
+AND cp.total_commission_paid > c.total_paid_premium;","SELECT c.contract_id, c.policyholder_id, c.termination_date, c.total_paid_premium, cp.total_commission_paid, (cp.total_commission_paid - c.total_paid_premium) AS excess_commission FROM contracts c JOIN commission_payments cp ON cp.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_status = 'terminated' AND CAST(JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) AS INTEGER) <= 365 AND cp.total_commission_paid > c.total_paid_premium ORDER BY excess_commission DESC",1,0,0,1886.32,,
+UW053,계약관리,challenging,medium,3,text2sql,"SELECT c.contract_id, c.product_id, c.insured_id, c.total_paid_premium, cp.total_commission_paid
+FROM contracts c
+JOIN commission_payments cp ON c.contract_id = cp.contract_id
+WHERE c.contract_status = 'terminated'
+AND JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) <= 365
+AND cp.total_commission_paid > c.total_paid_premium;","SELECT c.contract_id, c.policyholder_id, c.termination_date, c.total_paid_premium, cp.total_commission_paid, (cp.total_commission_paid - c.total_paid_premium) AS excess_commission FROM contracts c JOIN commission_payments cp ON cp.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_status = 'terminated' AND CAST(JULIANDAY(c.termination_date) - JULIANDAY(c.contract_date) AS INTEGER) <= 365 AND cp.total_commission_paid > c.total_paid_premium ORDER BY excess_commission DESC",1,0,0,1921.28,,
+UW054,계약관리,challenging,low,1,text2sql,"SELECT 
+    a.agent_id,
+    a.agent_name,
+    COUNT(CASE WHEN c.contract_type = '진단계약' THEN 1 END) AS total_guarantee_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'split' THEN 1 END) AS split_commission_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'standard' THEN 1 END) AS standard_commission_contracts
+FROM 
+    agents a
+JOIN 
+    contracts c ON a.agent_id = c.agent_id
+JOIN 
+    commission_plans p ON a.commission_plan_id = p.commission_plan_id
+WHERE 
+    c.contract_status = 'active'
+GROUP BY 
+    a.agent_id, a.agent_name;","SELECT cp.commission_type, COUNT(c.contract_id) AS total_contracts, SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) AS retained_13th, ROUND(100.0 * SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS retention_rate_13th FROM contracts c JOIN agents a ON a.agent_id = c.agent_id JOIN commission_plans cp ON cp.commission_plan_id = a.commission_plan_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date BETWEEN DATE('now', '-2 years') AND DATE('now', '-13 months') GROUP BY cp.commission_type",0,0,0,3728.86,,pred_sql 오류: no such column: p.payment_type
+UW054,계약관리,challenging,low,2,text2sql,"SELECT 
+    a.agent_id,
+    a.agent_name,
+    COUNT(CASE WHEN c.contract_type = '진단계약' THEN 1 END) AS total_guarantee_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'split' THEN 1 END) AS split_commission_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'standard' THEN 1 END) AS standard_commission_contracts
+FROM 
+    agents a
+JOIN 
+    contracts c ON a.agent_id = c.agent_id
+JOIN 
+    commission_plans p ON a.commission_plan_id = p.commission_plan_id
+WHERE 
+    c.contract_status = 'active'
+GROUP BY 
+    a.agent_id, a.agent_name;","SELECT cp.commission_type, COUNT(c.contract_id) AS total_contracts, SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) AS retained_13th, ROUND(100.0 * SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS retention_rate_13th FROM contracts c JOIN agents a ON a.agent_id = c.agent_id JOIN commission_plans cp ON cp.commission_plan_id = a.commission_plan_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date BETWEEN DATE('now', '-2 years') AND DATE('now', '-13 months') GROUP BY cp.commission_type",0,0,0,2497.4,,pred_sql 오류: no such column: p.payment_type
+UW054,계약관리,challenging,low,3,text2sql,"SELECT 
+    a.agent_id,
+    a.agent_name,
+    COUNT(CASE WHEN c.contract_type = '진단계약' THEN 1 END) AS total_guarantee_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'split' THEN 1 END) AS split_commission_contracts,
+    COUNT(CASE WHEN c.contract_type = '진단계약' AND p.payment_type = 'standard' THEN 1 END) AS standard_commission_contracts
+FROM 
+    agents a
+JOIN 
+    contracts c ON a.agent_id = c.agent_id
+JOIN 
+    commission_plans p ON a.commission_plan_id = p.commission_plan_id
+WHERE 
+    c.contract_status = 'active'
+GROUP BY 
+    a.agent_id, a.agent_name;","SELECT cp.commission_type, COUNT(c.contract_id) AS total_contracts, SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) AS retained_13th, ROUND(100.0 * SUM(CASE WHEN c.payment_count >= 13 THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS retention_rate_13th FROM contracts c JOIN agents a ON a.agent_id = c.agent_id JOIN commission_plans cp ON cp.commission_plan_id = a.commission_plan_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'protection' AND c.contract_date BETWEEN DATE('now', '-2 years') AND DATE('now', '-13 months') GROUP BY cp.commission_type",0,0,0,3883.0,,pred_sql 오류: no such column: p.payment_type
+UW055,계약심사,moderate,medium,1,text2sql,"SELECT c.contract_id, c.min_death_benefit, a.agent_id, a.agent_name
+FROM contracts c
+JOIN agents a ON c.agent_id = a.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'variable' AND c.min_death_benefit IS NULL;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, a.agent_id, a.agent_name FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN agents a ON a.agent_id = c.agent_id WHERE pr.product_category = 'variable' AND (c.min_death_benefit IS NULL OR c.min_death_benefit = 0) AND c.contract_status = 'active'",0,25,17,1585.53,,
+UW055,계약심사,moderate,medium,2,text2sql,"SELECT c.contract_id, c.min_death_benefit, a.agent_id, a.agent_name
+FROM contracts c
+JOIN agents a ON c.agent_id = a.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'variable' AND c.min_death_benefit IS NULL;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, a.agent_id, a.agent_name FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN agents a ON a.agent_id = c.agent_id WHERE pr.product_category = 'variable' AND (c.min_death_benefit IS NULL OR c.min_death_benefit = 0) AND c.contract_status = 'active'",0,25,17,1257.39,,
+UW055,계약심사,moderate,medium,3,text2sql,"SELECT c.contract_id, c.min_death_benefit, a.agent_id, a.agent_name
+FROM contracts c
+JOIN agents a ON c.agent_id = a.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'variable' AND c.min_death_benefit IS NULL;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, a.agent_id, a.agent_name FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN agents a ON a.agent_id = c.agent_id WHERE pr.product_category = 'variable' AND (c.min_death_benefit IS NULL OR c.min_death_benefit = 0) AND c.contract_status = 'active'",0,25,17,1510.75,,
+UW056,계약심사,moderate,low,1,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_policyholder_reserve
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'interest_linked' AND p.min_guaranteed_rate IS NULL;","SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_reserve FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'interest_linked' AND (pr.min_guaranteed_rate IS NULL OR pr.min_guaranteed_rate = 0) AND c.contract_status = 'active'",1,1,1,1522.55,,
+UW056,계약심사,moderate,low,2,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_policyholder_reserve
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'interest_linked' AND p.min_guaranteed_rate IS NULL;","SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_reserve FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'interest_linked' AND (pr.min_guaranteed_rate IS NULL OR pr.min_guaranteed_rate = 0) AND c.contract_status = 'active'",1,1,1,1420.11,,
+UW056,계약심사,moderate,low,3,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_policyholder_reserve
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'interest_linked' AND p.min_guaranteed_rate IS NULL;","SELECT COUNT(c.contract_id) AS contract_count, SUM(c.policyholder_reserve) AS total_reserve FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'interest_linked' AND (pr.min_guaranteed_rate IS NULL OR pr.min_guaranteed_rate = 0) AND c.contract_status = 'active'",1,1,1,2184.0,,
+UW057,계약심사,moderate,low,1,text2sql,"SELECT c.contract_date, p.product_name
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.medical_insurance_subtype = 'basic' AND p.inpatient_deductible_rate <> 0.2;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, pr.inpatient_deductible_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND ABS(pr.inpatient_deductible_rate - 0.20) > 0.001 AND c.contract_status = 'active'",1,0,0,1284.9,,
+UW057,계약심사,moderate,low,2,text2sql,"SELECT c.contract_date, p.product_name
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.medical_insurance_subtype = 'basic' AND p.inpatient_deductible_rate <> 0.2;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, pr.inpatient_deductible_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND ABS(pr.inpatient_deductible_rate - 0.20) > 0.001 AND c.contract_status = 'active'",1,0,0,1245.67,,
+UW057,계약심사,moderate,low,3,text2sql,"SELECT c.contract_date, p.product_name
+FROM contracts c
+JOIN products p ON c.product_id = p.product_id
+WHERE p.medical_insurance_subtype = 'basic' AND p.inpatient_deductible_rate <> 0.2;","SELECT c.contract_id, c.insured_id, c.contract_date, pr.product_name, pr.inpatient_deductible_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND ABS(pr.inpatient_deductible_rate - 0.20) > 0.001 AND c.contract_status = 'active'",1,0,0,1351.42,,
+UW058,보험료산출,challenging,medium,1,text2sql,"SELECT c.contract_id, c.original_premium, c.corrected_premium
+FROM contracts c
+JOIN underwriting_decisions u ON c.contract_id = u.contract_id
+JOIN claims cl ON c.contract_id = cl.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_category = 'medical' 
+AND u.decision_type IN ('승낙', '조건부승낙')
+AND (c.corrected_premium - c.original_premium) / c.original_premium * 100 > 25
+AND cl.claim_date >= DATE('now', '-12 months');","SELECT c.contract_id, c.insured_id, rh.renewal_date, rh.premium_before_renewal, rh.premium_after_renewal, ROUND(100.0 * ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal, 2) AS change_rate_pct FROM contracts c JOIN contract_revivals rh ON rh.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND rh.relative_rate_applied = 1 AND ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal > 0.25 ORDER BY change_rate_pct DESC",0,0,2,3040.04,,
+UW058,보험료산출,challenging,medium,2,text2sql,"SELECT c.contract_id, c.original_premium, c.corrected_premium
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'actual_loss_medical'
+AND ud.decision_type = '조건부승낙'
+AND (c.corrected_premium - c.original_premium) / c.original_premium * 100 > 25;","SELECT c.contract_id, c.insured_id, rh.renewal_date, rh.premium_before_renewal, rh.premium_after_renewal, ROUND(100.0 * ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal, 2) AS change_rate_pct FROM contracts c JOIN contract_revivals rh ON rh.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND rh.relative_rate_applied = 1 AND ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal > 0.25 ORDER BY change_rate_pct DESC",0,0,2,1714.71,,
+UW058,보험료산출,challenging,medium,3,text2sql,"SELECT c.contract_id, c.original_premium, c.corrected_premium
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN products p ON c.product_id = p.product_id
+WHERE p.product_type = 'actual_loss_medical'
+AND ud.decision_type = '조건부승낙'
+AND (c.corrected_premium - c.original_premium) / c.original_premium * 100 > 25;","SELECT c.contract_id, c.insured_id, rh.renewal_date, rh.premium_before_renewal, rh.premium_after_renewal, ROUND(100.0 * ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal, 2) AS change_rate_pct FROM contracts c JOIN contract_revivals rh ON rh.contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_type = 'actual_loss_medical' AND rh.relative_rate_applied = 1 AND ABS(rh.premium_after_renewal - rh.premium_before_renewal) / rh.premium_before_renewal > 0.25 ORDER BY change_rate_pct DESC",0,0,2,1976.87,,
+UW059,계약관리,moderate,low,1,text2sql,"SELECT p.product_id, p.product_name, COUNT(c.contract_id) AS active_contract_count
+FROM products p
+JOIN contracts c ON p.product_id = c.product_id
+WHERE p.insurance_period_years > 5 AND c.contract_status = 'active'
+GROUP BY p.product_id, p.product_name;","SELECT pr.product_id, pr.product_name, pr.last_coverage_change_date, CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) / 365 AS years_since_change, COUNT(c.contract_id) AS active_contract_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_type = 'actual_loss_medical' AND pr.contract_type = 'main' AND CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) > 1825 GROUP BY pr.product_id, pr.product_name, pr.last_coverage_change_date ORDER BY years_since_change DESC",0,3,0,1595.3,,
+UW059,계약관리,moderate,low,2,text2sql,"SELECT p.product_id, p.product_name, COUNT(c.contract_id) AS active_contract_count
+FROM products p
+JOIN contracts c ON p.product_id = c.product_id
+WHERE p.insurance_period_years > 5 AND p.coverage_type = '실손의료보험' AND c.contract_status = 'active'
+GROUP BY p.product_id, p.product_name;","SELECT pr.product_id, pr.product_name, pr.last_coverage_change_date, CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) / 365 AS years_since_change, COUNT(c.contract_id) AS active_contract_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_type = 'actual_loss_medical' AND pr.contract_type = 'main' AND CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) > 1825 GROUP BY pr.product_id, pr.product_name, pr.last_coverage_change_date ORDER BY years_since_change DESC",0,0,0,1506.91,,pred_sql 오류: no such column: p.coverage_type
+UW059,계약관리,moderate,low,3,text2sql,"SELECT p.product_id, p.product_name, COUNT(c.contract_id) AS active_contract_count
+FROM products p
+JOIN contracts c ON p.product_id = c.product_id
+WHERE p.insurance_period_years > 5 AND p.coverage_type = '실손의료보험' AND c.contract_status = 'active'
+GROUP BY p.product_id, p.product_name;","SELECT pr.product_id, pr.product_name, pr.last_coverage_change_date, CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) / 365 AS years_since_change, COUNT(c.contract_id) AS active_contract_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_type = 'actual_loss_medical' AND pr.contract_type = 'main' AND CAST(JULIANDAY('now') - JULIANDAY(pr.last_coverage_change_date) AS INTEGER) > 1825 GROUP BY pr.product_id, pr.product_name, pr.last_coverage_change_date ORDER BY years_since_change DESC",0,0,0,1560.31,,pred_sql 오류: no such column: p.coverage_type
+UW060,계약관리,moderate,medium,1,text2sql,"SELECT COUNT(*) AS contract_count, 
+       SUM(surrender_value - policyholder_reserve) AS shortfall_amount
+FROM contracts
+WHERE policyholder_reserve < surrender_value;","SELECT COUNT(c.contract_id) AS shortfall_count, SUM(c.surrender_value - c.remaining_coverage_reserve) AS total_shortfall FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE c.contract_status = 'active' AND c.remaining_coverage_reserve < c.surrender_value AND pr.product_category IN ('protection', 'savings', 'annuity')",0,1,1,998.59,,
+UW060,계약관리,moderate,medium,2,text2sql,"SELECT COUNT(*) AS contract_count, 
+       SUM(surrender_value - policyholder_reserve) AS shortfall_amount
+FROM contracts
+WHERE policyholder_reserve < surrender_value;","SELECT COUNT(c.contract_id) AS shortfall_count, SUM(c.surrender_value - c.remaining_coverage_reserve) AS total_shortfall FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE c.contract_status = 'active' AND c.remaining_coverage_reserve < c.surrender_value AND pr.product_category IN ('protection', 'savings', 'annuity')",0,1,1,1090.69,,
+UW060,계약관리,moderate,medium,3,text2sql,"SELECT COUNT(*) AS contract_count, 
+       SUM(surrender_value - policyholder_reserve) AS shortfall_amount
+FROM contracts
+WHERE policyholder_reserve < surrender_value;","SELECT COUNT(c.contract_id) AS shortfall_count, SUM(c.surrender_value - c.remaining_coverage_reserve) AS total_shortfall FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE c.contract_status = 'active' AND c.remaining_coverage_reserve < c.surrender_value AND pr.product_category IN ('protection', 'savings', 'annuity')",0,1,1,1041.85,,
+UW061,재무리스크,challenging,medium,1,text2sql,"SELECT SUM(surrender_value * 0.8) AS total_reserve_estimate
+FROM contracts
+WHERE company_id IN (
+    SELECT company_id
+    FROM insurance_companies
+    WHERE solvency_ratio_last_quarter < 150
+);","SELECT ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter, SUM(CASE WHEN c.remaining_coverage_reserve < c.surrender_value THEN (c.surrender_value - c.remaining_coverage_reserve) * 0.80 ELSE 0 END) AS estimated_reserve FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio_last_quarter < 150 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter",0,1,2,1185.37,,
+UW061,재무리스크,challenging,medium,2,text2sql,"SELECT SUM(surrender_value * 0.8) AS total_reserve_estimate
+FROM contracts
+WHERE company_id IN (
+    SELECT company_id
+    FROM insurance_companies
+    WHERE solvency_ratio_last_quarter < 150
+);","SELECT ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter, SUM(CASE WHEN c.remaining_coverage_reserve < c.surrender_value THEN (c.surrender_value - c.remaining_coverage_reserve) * 0.80 ELSE 0 END) AS estimated_reserve FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio_last_quarter < 150 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter",0,1,2,1107.16,,
+UW061,재무리스크,challenging,medium,3,text2sql,"SELECT SUM(surrender_value * 0.8) AS total_reserve_estimate
+FROM contracts
+WHERE company_id IN (
+    SELECT company_id
+    FROM insurance_companies
+    WHERE solvency_ratio_last_quarter < 150
+);","SELECT ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter, SUM(CASE WHEN c.remaining_coverage_reserve < c.surrender_value THEN (c.surrender_value - c.remaining_coverage_reserve) * 0.80 ELSE 0 END) AS estimated_reserve FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio_last_quarter < 150 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio_last_quarter",0,1,2,1193.84,,
+UW062,재무리스크,moderate,medium,1,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.total_paid_premium) AS total_premium_income
+FROM contracts c
+JOIN insurance_companies ic ON c.company_id = ic.company_id
+WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100;","SELECT ic.company_id, ic.company_name, ic.solvency_ratio, COUNT(c.contract_id) AS contract_count, SUM(c.annual_premium) AS total_annual_premium FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio",0,1,1,1237.3,,
+UW062,재무리스크,moderate,medium,2,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.total_paid_premium) AS total_premium_income
+FROM contracts c
+JOIN insurance_companies ic ON c.company_id = ic.company_id
+WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100;","SELECT ic.company_id, ic.company_name, ic.solvency_ratio, COUNT(c.contract_id) AS contract_count, SUM(c.annual_premium) AS total_annual_premium FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio",0,1,1,1288.79,,
+UW062,재무리스크,moderate,medium,3,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, SUM(c.total_paid_premium) AS total_premium_income
+FROM contracts c
+JOIN insurance_companies ic ON c.company_id = ic.company_id
+WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100;","SELECT ic.company_id, ic.company_name, ic.solvency_ratio, COUNT(c.contract_id) AS contract_count, SUM(c.annual_premium) AS total_annual_premium FROM insurance_companies ic JOIN contracts c ON c.company_id = ic.company_id WHERE ic.solvency_ratio >= 50 AND ic.solvency_ratio < 100 AND c.contract_status = 'active' GROUP BY ic.company_id, ic.company_name, ic.solvency_ratio",0,1,1,1620.72,,
+UW063,장해리스크,challenging,low,1,text2sql,"SELECT 
+    p.product_id,
+    COUNT(c.contract_id) AS contract_count,
+    AVG(c.sum_insured) AS average_insured_amount
+FROM 
+    products p
+JOIN 
+    risk_capitals r ON p.product_id = r.product_id
+JOIN 
+    contracts c ON p.product_id = c.product_id
+GROUP BY 
+    p.product_id
+ORDER BY 
+    MAX(r.mortality_risk_amount) DESC
+LIMIT 5;","SELECT pr.product_id, pr.product_name, rc.mortality_risk_amount, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.sum_insured), 0) AS avg_sum_insured FROM products pr JOIN risk_capitals rc ON rc.product_id = pr.product_id JOIN contracts c ON c.product_id = pr.product_id WHERE c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rc.mortality_risk_amount ORDER BY rc.mortality_risk_amount DESC LIMIT 5",0,5,5,1536.5,,
+UW063,장해리스크,challenging,low,2,text2sql,"SELECT 
+    p.product_id,
+    COUNT(c.contract_id) AS contract_count,
+    AVG(c.sum_insured) AS average_insured_amount
+FROM 
+    products p
+JOIN 
+    risk_capitals r ON p.product_id = r.product_id
+JOIN 
+    contracts c ON p.product_id = c.product_id
+WHERE 
+    r.mortality_risk_amount > 0
+GROUP BY 
+    p.product_id
+ORDER BY 
+    r.mortality_risk_amount DESC
+LIMIT 5;","SELECT pr.product_id, pr.product_name, rc.mortality_risk_amount, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.sum_insured), 0) AS avg_sum_insured FROM products pr JOIN risk_capitals rc ON rc.product_id = pr.product_id JOIN contracts c ON c.product_id = pr.product_id WHERE c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rc.mortality_risk_amount ORDER BY rc.mortality_risk_amount DESC LIMIT 5",0,5,5,1729.71,,
+UW063,장해리스크,challenging,low,3,text2sql,"SELECT 
+    p.product_id,
+    COUNT(c.contract_id) AS contract_count,
+    AVG(c.sum_insured) AS average_insured_amount
+FROM 
+    products p
+JOIN 
+    risk_capitals r ON p.product_id = r.product_id
+JOIN 
+    contracts c ON p.product_id = c.product_id
+WHERE 
+    r.mortality_risk_amount > 0
+GROUP BY 
+    p.product_id
+ORDER BY 
+    r.mortality_risk_amount DESC
+LIMIT 5;","SELECT pr.product_id, pr.product_name, rc.mortality_risk_amount, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.sum_insured), 0) AS avg_sum_insured FROM products pr JOIN risk_capitals rc ON rc.product_id = pr.product_id JOIN contracts c ON c.product_id = pr.product_id WHERE c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rc.mortality_risk_amount ORDER BY rc.mortality_risk_amount DESC LIMIT 5",0,5,5,1768.51,,
+UW064,장해리스크,challenging,medium,1,text2sql,"SELECT 
+    r.product_id,
+    COUNT(w.withdrawal_id) AS recent_withdrawal_count,
+    SUM(w.withdrawal_amount) AS total_surrender_value
+FROM 
+    risk_capitals r
+JOIN 
+    risk_capitals r_prev ON r.product_id = r_prev.product_id AND r.quarter = r_prev.quarter + 1
+LEFT JOIN 
+    contract_withdrawals w ON r.product_id = w.contract_id AND w.withdrawal_date >= DATE('now', '-3 months')
+WHERE 
+    r.lapse_risk_amount >= r_prev.lapse_risk_amount * 1.2
+GROUP BY 
+    r.product_id;","SELECT rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount AS prev_lapse_risk, rc_curr.lapse_risk_amount AS curr_lapse_risk, ROUND(100.0 * (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount, 2) AS change_pct, COUNT(c.contract_id) AS lapse_count_3m, SUM(c.surrender_value) AS total_surrender FROM risk_capitals rc_curr JOIN risk_capitals rc_prev ON rc_prev.product_id = rc_curr.product_id AND rc_prev.quarter = rc_curr.quarter - 1 JOIN products pr ON pr.product_id = rc_curr.product_id LEFT JOIN contracts c ON c.product_id = rc_curr.product_id AND c.contract_status = 'terminated' AND c.termination_reason = 'lapse' AND c.termination_date >= DATE('now', '-3 months') WHERE rc_curr.quarter = (SELECT MAX(quarter) FROM risk_capitals) AND (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount >= 0.20 GROUP BY rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount, rc_curr.lapse_risk_amount ORDER BY change_pct DESC",0,0,7,2123.27,,pred_sql 오류: no such column: w.withdrawal_amount
+UW064,장해리스크,challenging,medium,2,text2sql,"SELECT 
+    r.product_id,
+    (SELECT COUNT(*) FROM contract_withdrawals cw WHERE cw.contract_id IN (SELECT c.contract_id FROM contracts c WHERE c.product_id = r.product_id AND JULIANDAY(c.created_at) >= JULIANDAY('now', '-3 months'))) AS recent_withdrawal_count,
+    (SELECT SUM(cw.surrender_value) FROM contract_withdrawals cw WHERE cw.contract_id IN (SELECT c.contract_id FROM contracts c WHERE c.product_id = r.product_id AND JULIANDAY(c.created_at) >= JULIANDAY('now', '-3 months'))) AS total_surrender_value
+FROM 
+    risk_capitals r
+WHERE 
+    r.lapse_risk_amount >= (SELECT lapse_risk_amount FROM risk_capitals WHERE product_id = r.product_id AND quarter = (SELECT MAX(quarter) FROM risk_capitals WHERE quarter < r.quarter)) * 1.2;","SELECT rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount AS prev_lapse_risk, rc_curr.lapse_risk_amount AS curr_lapse_risk, ROUND(100.0 * (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount, 2) AS change_pct, COUNT(c.contract_id) AS lapse_count_3m, SUM(c.surrender_value) AS total_surrender FROM risk_capitals rc_curr JOIN risk_capitals rc_prev ON rc_prev.product_id = rc_curr.product_id AND rc_prev.quarter = rc_curr.quarter - 1 JOIN products pr ON pr.product_id = rc_curr.product_id LEFT JOIN contracts c ON c.product_id = rc_curr.product_id AND c.contract_status = 'terminated' AND c.termination_reason = 'lapse' AND c.termination_date >= DATE('now', '-3 months') WHERE rc_curr.quarter = (SELECT MAX(quarter) FROM risk_capitals) AND (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount >= 0.20 GROUP BY rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount, rc_curr.lapse_risk_amount ORDER BY change_pct DESC",0,0,7,2847.86,,pred_sql 오류: no such column: cw.surrender_value
+UW064,장해리스크,challenging,medium,3,text2sql,"SELECT 
+    r.product_id,
+    COUNT(w.withdrawal_id) AS recent_withdrawal_count,
+    SUM(w.withdrawal_amount) AS total_surrender_value
+FROM 
+    risk_capitals r
+JOIN 
+    risk_capitals r_prev ON r.product_id = r_prev.product_id AND r.quarter = r_prev.quarter + 1
+LEFT JOIN 
+    contract_withdrawals w ON r.product_id = w.contract_id AND w.withdrawal_date >= DATE('now', '-3 months')
+WHERE 
+    r.lapse_risk_amount >= r_prev.lapse_risk_amount * 1.2
+GROUP BY 
+    r.product_id;","SELECT rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount AS prev_lapse_risk, rc_curr.lapse_risk_amount AS curr_lapse_risk, ROUND(100.0 * (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount, 2) AS change_pct, COUNT(c.contract_id) AS lapse_count_3m, SUM(c.surrender_value) AS total_surrender FROM risk_capitals rc_curr JOIN risk_capitals rc_prev ON rc_prev.product_id = rc_curr.product_id AND rc_prev.quarter = rc_curr.quarter - 1 JOIN products pr ON pr.product_id = rc_curr.product_id LEFT JOIN contracts c ON c.product_id = rc_curr.product_id AND c.contract_status = 'terminated' AND c.termination_reason = 'lapse' AND c.termination_date >= DATE('now', '-3 months') WHERE rc_curr.quarter = (SELECT MAX(quarter) FROM risk_capitals) AND (rc_curr.lapse_risk_amount - rc_prev.lapse_risk_amount) / rc_prev.lapse_risk_amount >= 0.20 GROUP BY rc_curr.product_id, pr.product_name, rc_prev.lapse_risk_amount, rc_curr.lapse_risk_amount ORDER BY change_pct DESC",0,0,7,1954.47,,pred_sql 오류: no such column: w.withdrawal_amount
+UW065,재무리스크,challenging,medium,1,text2sql,"SELECT 
+    asset_classification,
+    SUM(loan_balance) AS total_loan_balance,
+    SUM(actual_allowance) AS total_allowance
+FROM 
+    asset_loan_classifications
+WHERE 
+    asset_classification IN ('normal', 'precautionary', 'substandard', 'doubtful', 'loss')
+GROUP BY 
+    asset_classification;","SELECT alc.asset_classification, SUM(alc.loan_balance) AS total_loan_balance, SUM(CASE alc.asset_classification WHEN 'substandard' THEN alc.loan_balance * 0.20 WHEN 'doubtful' THEN alc.loan_balance * 0.50 WHEN 'loss' THEN alc.loan_balance * 1.00 ELSE 0 END) AS min_required_allowance FROM asset_loan_classifications alc WHERE alc.asset_classification IN ('substandard', 'doubtful', 'loss') GROUP BY alc.asset_classification ORDER BY CASE alc.asset_classification WHEN 'substandard' THEN 1 WHEN 'doubtful' THEN 2 WHEN 'loss' THEN 3 END",0,5,3,1392.16,,
+UW065,재무리스크,challenging,medium,2,text2sql,"SELECT 
+    asset_classification,
+    SUM(loan_balance) AS total_loan_balance,
+    SUM(actual_allowance) AS total_allowance
+FROM 
+    asset_loan_classifications
+WHERE 
+    asset_classification IN ('normal', 'precautionary', 'substandard', 'doubtful', 'loss')
+GROUP BY 
+    asset_classification;","SELECT alc.asset_classification, SUM(alc.loan_balance) AS total_loan_balance, SUM(CASE alc.asset_classification WHEN 'substandard' THEN alc.loan_balance * 0.20 WHEN 'doubtful' THEN alc.loan_balance * 0.50 WHEN 'loss' THEN alc.loan_balance * 1.00 ELSE 0 END) AS min_required_allowance FROM asset_loan_classifications alc WHERE alc.asset_classification IN ('substandard', 'doubtful', 'loss') GROUP BY alc.asset_classification ORDER BY CASE alc.asset_classification WHEN 'substandard' THEN 1 WHEN 'doubtful' THEN 2 WHEN 'loss' THEN 3 END",0,5,3,1343.73,,
+UW065,재무리스크,challenging,medium,3,text2sql,"SELECT 
+    asset_classification,
+    SUM(loan_balance) AS total_loan_balance,
+    SUM(actual_allowance) AS total_allowance
+FROM 
+    asset_loan_classifications
+WHERE 
+    asset_classification IN ('normal', 'precautionary', 'substandard', 'doubtful', 'loss')
+GROUP BY 
+    asset_classification;","SELECT alc.asset_classification, SUM(alc.loan_balance) AS total_loan_balance, SUM(CASE alc.asset_classification WHEN 'substandard' THEN alc.loan_balance * 0.20 WHEN 'doubtful' THEN alc.loan_balance * 0.50 WHEN 'loss' THEN alc.loan_balance * 1.00 ELSE 0 END) AS min_required_allowance FROM asset_loan_classifications alc WHERE alc.asset_classification IN ('substandard', 'doubtful', 'loss') GROUP BY alc.asset_classification ORDER BY CASE alc.asset_classification WHEN 'substandard' THEN 1 WHEN 'doubtful' THEN 2 WHEN 'loss' THEN 3 END",0,5,3,1551.47,,
+UW066,재무리스크,moderate,medium,1,text2sql,"SELECT COUNT(*) AS loan_count, 
+       SUM(loan_balance) AS total_loan_balance, 
+       SUM(CASE WHEN asset_classification = 'precautionary' THEN loan_balance * 0.1 ELSE 0 END) AS required_allowance, 
+       SUM(actual_allowance) AS actual_allowance
+FROM asset_loan_classifications
+WHERE loan_type = 'household';","SELECT COUNT(alc.loan_id) AS loan_count, SUM(alc.loan_balance) AS total_balance, SUM(alc.loan_balance * 0.10) AS required_allowance, SUM(alc.actual_allowance) AS actual_allowance, SUM(alc.loan_balance * 0.10) - SUM(alc.actual_allowance) AS shortfall FROM asset_loan_classifications alc WHERE alc.loan_type = 'household' AND alc.asset_classification = 'precautionary'",0,1,1,1429.67,,
+UW066,재무리스크,moderate,medium,2,text2sql,"SELECT COUNT(*) AS loan_count, 
+       SUM(loan_balance) AS total_loan_balance, 
+       SUM(CASE WHEN asset_classification = 'precautionary' THEN loan_balance * 0.1 ELSE 0 END) AS required_allowance, 
+       SUM(actual_allowance) AS actual_allowance
+FROM asset_loan_classifications
+WHERE loan_type = 'household';","SELECT COUNT(alc.loan_id) AS loan_count, SUM(alc.loan_balance) AS total_balance, SUM(alc.loan_balance * 0.10) AS required_allowance, SUM(alc.actual_allowance) AS actual_allowance, SUM(alc.loan_balance * 0.10) - SUM(alc.actual_allowance) AS shortfall FROM asset_loan_classifications alc WHERE alc.loan_type = 'household' AND alc.asset_classification = 'precautionary'",0,1,1,1497.08,,
+UW066,재무리스크,moderate,medium,3,text2sql,"SELECT COUNT(*) AS loan_count, 
+       SUM(loan_balance) AS total_loan_balance, 
+       SUM(CASE WHEN asset_classification = 'precautionary' THEN loan_balance * 0.1 ELSE 0 END) AS required_allowance, 
+       SUM(actual_allowance) AS actual_allowance
+FROM asset_loan_classifications
+WHERE loan_type = 'household';","SELECT COUNT(alc.loan_id) AS loan_count, SUM(alc.loan_balance) AS total_balance, SUM(alc.loan_balance * 0.10) AS required_allowance, SUM(alc.actual_allowance) AS actual_allowance, SUM(alc.loan_balance * 0.10) - SUM(alc.actual_allowance) AS shortfall FROM asset_loan_classifications alc WHERE alc.loan_type = 'household' AND alc.asset_classification = 'precautionary'",0,1,1,1420.41,,
+UW067,계약심사,moderate,medium,1,text2sql,"SELECT a.product_id, COUNT(c.contract_id) AS contract_count
+FROM actuary_opinions a
+JOIN contracts c ON a.product_id = c.product_id
+WHERE a.verification_item = 'liability_reserve' AND a.opinion_result = 'adverse'
+GROUP BY a.product_id;","SELECT ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result, COUNT(c.contract_id) AS affected_contract_count FROM actuary_opinions ao JOIN products pr ON pr.product_id = ao.product_id LEFT JOIN contracts c ON c.product_id = ao.product_id AND c.contract_status = 'active' WHERE ao.verification_item = 'liability_reserve' AND ao.opinion_result = 'adverse' AND ao.submission_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 GROUP BY ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result",1,0,0,1589.53,,
+UW067,계약심사,moderate,medium,2,text2sql,"SELECT a.product_id, COUNT(c.contract_id) AS contract_count
+FROM actuary_opinions a
+JOIN contracts c ON a.product_id = c.product_id
+WHERE a.verification_item = 'liability_reserve' AND a.opinion_result = 'adverse'
+GROUP BY a.product_id;","SELECT ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result, COUNT(c.contract_id) AS affected_contract_count FROM actuary_opinions ao JOIN products pr ON pr.product_id = ao.product_id LEFT JOIN contracts c ON c.product_id = ao.product_id AND c.contract_status = 'active' WHERE ao.verification_item = 'liability_reserve' AND ao.opinion_result = 'adverse' AND ao.submission_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 GROUP BY ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result",1,0,0,1200.05,,
+UW067,계약심사,moderate,medium,3,text2sql,"SELECT a.product_id, COUNT(c.contract_id) AS contract_count
+FROM actuary_opinions a
+JOIN contracts c ON a.product_id = c.product_id
+WHERE a.verification_item = 'liability_reserve' AND a.opinion_result = 'adverse'
+GROUP BY a.product_id;","SELECT ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result, COUNT(c.contract_id) AS affected_contract_count FROM actuary_opinions ao JOIN products pr ON pr.product_id = ao.product_id LEFT JOIN contracts c ON c.product_id = ao.product_id AND c.contract_status = 'active' WHERE ao.verification_item = 'liability_reserve' AND ao.opinion_result = 'adverse' AND ao.submission_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 GROUP BY ao.product_id, pr.product_name, ao.verification_item, ao.opinion_result",1,0,0,1255.13,,
+UW068,보험료산출,moderate,medium,1,text2sql,"SELECT 
+    (insured_age_at_contract / 10) * 10 AS age_group,
+    AVG(sum_insured) AS average_sum_insured,
+    STDEV(sum_insured) AS stddev_sum_insured
+FROM 
+    contracts
+WHERE 
+    contract_status = 'active'
+GROUP BY 
+    age_group;","SELECT (i.age_at_entry / 10) * 10 AS age_group_start, (i.age_at_entry / 10) * 10 + 9 AS age_group_end, COUNT(ct.contract_id) AS contract_count, ROUND(AVG(ct.sum_insured), 0) AS avg_sum_insured, ROUND(  AVG(ct.sum_insured * ct.sum_insured) - AVG(ct.sum_insured) * AVG(ct.sum_insured), 0) AS variance_sum_insured FROM contracts ct JOIN insured i ON i.insured_id = ct.insured_id JOIN products pr ON ct.product_id = pr.product_id WHERE pr.insurance_type = 'life' AND ct.contract_status = 'active' GROUP BY age_group_start, age_group_end ORDER BY age_group_start",0,0,6,1268.4,,pred_sql 오류: no such function: STDEV
+UW068,보험료산출,moderate,medium,2,text2sql,"SELECT 
+    (insured_age_at_contract / 10) * 10 AS age_group,
+    AVG(sum_insured) AS average_sum_insured,
+    (SELECT 
+        SQRT(AVG((sum_insured - avg_sum_insured) * (sum_insured - avg_sum_insured)))
+     FROM contracts
+     WHERE contract_status = 'active' 
+     GROUP BY (insured_age_at_contract / 10) * 10) AS stddev_sum_insured
+FROM contracts
+WHERE contract_status = 'active'
+GROUP BY age_group;","SELECT (i.age_at_entry / 10) * 10 AS age_group_start, (i.age_at_entry / 10) * 10 + 9 AS age_group_end, COUNT(ct.contract_id) AS contract_count, ROUND(AVG(ct.sum_insured), 0) AS avg_sum_insured, ROUND(  AVG(ct.sum_insured * ct.sum_insured) - AVG(ct.sum_insured) * AVG(ct.sum_insured), 0) AS variance_sum_insured FROM contracts ct JOIN insured i ON i.insured_id = ct.insured_id JOIN products pr ON ct.product_id = pr.product_id WHERE pr.insurance_type = 'life' AND ct.contract_status = 'active' GROUP BY age_group_start, age_group_end ORDER BY age_group_start",0,0,6,1802.78,,pred_sql 오류: no such function: SQRT
+UW068,보험료산출,moderate,medium,3,text2sql,"SELECT 
+    (insured_age_at_contract / 10) * 10 AS age_group,
+    AVG(sum_insured) AS average_sum_insured,
+    (SELECT 
+        SQRT(AVG((sum_insured - avg_sum_insured) * (sum_insured - avg_sum_insured)))
+     FROM contracts
+     WHERE insured_age_at_contract BETWEEN age_group AND age_group + 9
+     AND contract_status = 'active') AS stddev_sum_insured
+FROM contracts
+WHERE contract_status = 'active'
+GROUP BY age_group;","SELECT (i.age_at_entry / 10) * 10 AS age_group_start, (i.age_at_entry / 10) * 10 + 9 AS age_group_end, COUNT(ct.contract_id) AS contract_count, ROUND(AVG(ct.sum_insured), 0) AS avg_sum_insured, ROUND(  AVG(ct.sum_insured * ct.sum_insured) - AVG(ct.sum_insured) * AVG(ct.sum_insured), 0) AS variance_sum_insured FROM contracts ct JOIN insured i ON i.insured_id = ct.insured_id JOIN products pr ON ct.product_id = pr.product_id WHERE pr.insurance_type = 'life' AND ct.contract_status = 'active' GROUP BY age_group_start, age_group_end ORDER BY age_group_start",0,0,6,1924.03,,pred_sql 오류: no such function: SQRT
+UW069,사기탐지,challenging,medium,1,text2sql,"SELECT a.agent_id, a.agent_name, p.product_type
+FROM agents a
+JOIN agent_sales_stats ass ON a.agent_id = ass.agent_id
+JOIN contracts c ON a.agent_id = c.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE (ass.unfair_sale_count * 100.0 / ass.total_contracts) >= 1
+AND ass.unfair_sale_count >= 3;","SELECT a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, ROUND(100.0 * ass.unfair_sale_count / ass.total_contracts, 2) AS unfair_sale_rate, pr.product_category FROM agents a JOIN agent_sales_stats ass ON ass.agent_id = a.agent_id JOIN contracts c ON c.agent_id = a.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE ass.reference_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 AND ass.unfair_sale_count >= 3 AND CAST(ass.unfair_sale_count AS REAL) / ass.total_contracts >= 0.01 GROUP BY a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, pr.product_category ORDER BY unfair_sale_rate DESC",0,45,0,1518.09,,
+UW069,사기탐지,challenging,medium,2,text2sql,"SELECT a.agent_id, a.agent_name, p.product_type
+FROM agents a
+JOIN agent_sales_stats ass ON a.agent_id = ass.agent_id
+JOIN contracts c ON ass.stat_id = c.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE (ass.unfair_sale_count * 100.0 / ass.total_contracts) >= 1
+AND ass.unfair_sale_count >= 3;","SELECT a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, ROUND(100.0 * ass.unfair_sale_count / ass.total_contracts, 2) AS unfair_sale_rate, pr.product_category FROM agents a JOIN agent_sales_stats ass ON ass.agent_id = a.agent_id JOIN contracts c ON c.agent_id = a.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE ass.reference_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 AND ass.unfair_sale_count >= 3 AND CAST(ass.unfair_sale_count AS REAL) / ass.total_contracts >= 0.01 GROUP BY a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, pr.product_category ORDER BY unfair_sale_rate DESC",1,0,0,1523.52,,
+UW069,사기탐지,challenging,medium,3,text2sql,"SELECT a.agent_id, a.agent_name, p.product_type
+FROM agents a
+JOIN agent_sales_stats ass ON a.agent_id = ass.agent_id
+JOIN contracts c ON a.agent_id = c.agent_id
+JOIN products p ON c.product_id = p.product_id
+WHERE (ass.unfair_sale_count * 100.0 / ass.total_contracts) >= 1
+AND ass.unfair_sale_count >= 3;","SELECT a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, ROUND(100.0 * ass.unfair_sale_count / ass.total_contracts, 2) AS unfair_sale_rate, pr.product_category FROM agents a JOIN agent_sales_stats ass ON ass.agent_id = a.agent_id JOIN contracts c ON c.agent_id = a.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE ass.reference_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) - 1 AND ass.unfair_sale_count >= 3 AND CAST(ass.unfair_sale_count AS REAL) / ass.total_contracts >= 0.01 GROUP BY a.agent_id, a.agent_name, ass.total_contracts, ass.unfair_sale_count, pr.product_category ORDER BY unfair_sale_rate DESC",0,45,0,3419.88,,
+UW070,사기탐지,moderate,high,1,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, AVG(c.policyholder_reserve) AS average_policyholder_reserve
+FROM contracts c
+JOIN violation_records v ON c.agent_id = v.agent_id
+WHERE v.violation_type = 'unfair_sale';","SELECT vr.agent_id, a.agent_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.policyholder_reserve), 0) AS avg_reserve FROM violation_records vr JOIN agents a ON a.agent_id = vr.agent_id JOIN contracts c ON c.agent_id = vr.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE vr.violation_type = 'principal_guarantee_solicitation' AND pr.product_category = 'variable' AND c.contract_status = 'active' GROUP BY vr.agent_id, a.agent_name ORDER BY contract_count DESC",0,1,3,1080.27,,
+UW070,사기탐지,moderate,high,2,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, AVG(c.policyholder_reserve) AS average_policyholder_reserve
+FROM contracts c
+JOIN agents a ON c.agent_id = a.agent_id
+JOIN violation_records v ON a.agent_id = v.agent_id
+WHERE v.violation_type = 'unfair_sale' AND c.contract_type = '변액보험';","SELECT vr.agent_id, a.agent_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.policyholder_reserve), 0) AS avg_reserve FROM violation_records vr JOIN agents a ON a.agent_id = vr.agent_id JOIN contracts c ON c.agent_id = vr.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE vr.violation_type = 'principal_guarantee_solicitation' AND pr.product_category = 'variable' AND c.contract_status = 'active' GROUP BY vr.agent_id, a.agent_name ORDER BY contract_count DESC",0,1,3,1315.74,,
+UW070,사기탐지,moderate,high,3,text2sql,"SELECT COUNT(c.contract_id) AS contract_count, AVG(c.policyholder_reserve) AS average_policyholder_reserve
+FROM contracts c
+JOIN underwriting_decisions ud ON c.contract_id = ud.contract_id
+JOIN violation_records vr ON c.agent_id = vr.agent_id
+WHERE vr.violation_type = 'unfair_sale' AND ud.product_id IN (SELECT product_id FROM products WHERE product_type = 'variable');","SELECT vr.agent_id, a.agent_name, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.policyholder_reserve), 0) AS avg_reserve FROM violation_records vr JOIN agents a ON a.agent_id = vr.agent_id JOIN contracts c ON c.agent_id = vr.agent_id JOIN products pr ON c.product_id = pr.product_id WHERE vr.violation_type = 'principal_guarantee_solicitation' AND pr.product_category = 'variable' AND c.contract_status = 'active' GROUP BY vr.agent_id, a.agent_name ORDER BY contract_count DESC",0,1,3,1667.07,,
+UW071,고지의무,moderate,medium,1,text2sql,"SELECT COUNT(*) AS missing_voice_recordings, AVG(c.current_monthly_premium_krw) AS average_premium
+FROM contracts c
+JOIN sales_channels s ON c.contract_id = s.contract_id
+WHERE s.channel_type = 'telemarketing' AND s.voice_recording_completed = 0;","SELECT COUNT(c.contract_id) AS missing_recording_count, ROUND(AVG(c.monthly_premium), 0) AS avg_monthly_premium FROM contracts c JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND sc.voice_recording_completed = 0 AND c.contract_date >= DATE('now', '-1 year')",0,1,1,1602.64,,
+UW071,고지의무,moderate,medium,2,text2sql,"SELECT COUNT(*) AS missing_voice_recordings, AVG(c.current_monthly_premium_krw) AS average_premium
+FROM contracts c
+JOIN sales_channels s ON c.contract_id = s.contract_id
+WHERE s.channel_type = 'telemarketing' AND s.voice_recording_completed = 0;","SELECT COUNT(c.contract_id) AS missing_recording_count, ROUND(AVG(c.monthly_premium), 0) AS avg_monthly_premium FROM contracts c JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND sc.voice_recording_completed = 0 AND c.contract_date >= DATE('now', '-1 year')",0,1,1,1306.29,,
+UW071,고지의무,moderate,medium,3,text2sql,"SELECT COUNT(*) AS missing_voice_recordings, AVG(c.current_monthly_premium_krw) AS average_premium
+FROM contracts c
+JOIN sales_channels s ON c.contract_id = s.contract_id
+WHERE s.channel_type = 'telemarketing' AND s.voice_recording_completed = 0;","SELECT COUNT(c.contract_id) AS missing_recording_count, ROUND(AVG(c.monthly_premium), 0) AS avg_monthly_premium FROM contracts c JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND sc.voice_recording_completed = 0 AND c.contract_date >= DATE('now', '-1 year')",0,1,1,1440.45,,
+UW072,고지의무,challenging,medium,1,text2sql,"SELECT 
+    p.product_name,
+    COUNT(q.check_id) AS insufficient_explanation_count,
+    (COUNT(w.withdrawal_id) * 1.0 / COUNT(c.contract_id)) AS withdrawal_rate
+FROM 
+    quality_checks q
+JOIN 
+    contracts c ON q.contract_id = c.contract_id
+JOIN 
+    products p ON c.product_id = p.product_id
+LEFT JOIN 
+    contract_withdrawals w ON c.contract_id = w.contract_id
+WHERE 
+    q.check_result = 'insufficient_explanation' 
+    AND c.contract_id IN (SELECT contract_id FROM sales_channels WHERE channel_type = 'telemarketing')
+GROUP BY 
+    p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS insufficient_count, SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) AS withdrawal_count, ROUND(100.0 * SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS withdrawal_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id JOIN quality_checks qc ON qc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND qc.check_result = 'insufficient_explanation' AND qc.check_date >= DATE('now', '-6 months') GROUP BY pr.product_name ORDER BY insufficient_count DESC",0,1,0,2367.5,,
+UW072,고지의무,challenging,medium,2,text2sql,"SELECT 
+    p.product_name,
+    COUNT(q.check_id) AS insufficient_explanation_count,
+    (COUNT(w.withdrawal_id) * 1.0 / COUNT(c.contract_id)) AS withdrawal_rate
+FROM 
+    quality_checks q
+JOIN 
+    contracts c ON q.contract_id = c.contract_id
+JOIN 
+    products p ON c.product_id = p.product_id
+LEFT JOIN 
+    contract_withdrawals w ON c.contract_id = w.contract_id
+WHERE 
+    q.check_result = 'insufficient_explanation' 
+    AND c.contract_id IN (SELECT contract_id FROM sales_channels WHERE channel_type = 'telemarketing')
+GROUP BY 
+    p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS insufficient_count, SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) AS withdrawal_count, ROUND(100.0 * SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS withdrawal_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id JOIN quality_checks qc ON qc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND qc.check_result = 'insufficient_explanation' AND qc.check_date >= DATE('now', '-6 months') GROUP BY pr.product_name ORDER BY insufficient_count DESC",0,1,0,2569.52,,
+UW072,고지의무,challenging,medium,3,text2sql,"SELECT 
+    p.product_name,
+    COUNT(q.check_id) AS insufficient_explanation_count,
+    (COUNT(w.withdrawal_id) * 1.0 / COUNT(c.contract_id)) AS withdrawal_rate
+FROM 
+    quality_checks q
+JOIN 
+    contracts c ON q.contract_id = c.contract_id
+JOIN 
+    products p ON c.product_id = p.product_id
+LEFT JOIN 
+    contract_withdrawals w ON c.contract_id = w.contract_id
+WHERE 
+    q.check_result = 'insufficient_explanation' 
+    AND c.contract_id IN (SELECT contract_id FROM sales_channels WHERE channel_type = 'telemarketing')
+GROUP BY 
+    p.product_name;","SELECT pr.product_name, COUNT(c.contract_id) AS insufficient_count, SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) AS withdrawal_count, ROUND(100.0 * SUM(CASE WHEN c.contract_status = 'withdrawn' THEN 1 ELSE 0 END) / COUNT(c.contract_id), 2) AS withdrawal_rate FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id JOIN quality_checks qc ON qc.contract_id = c.contract_id WHERE sc.channel_type = 'telemarketing' AND qc.check_result = 'insufficient_explanation' AND qc.check_date >= DATE('now', '-6 months') GROUP BY pr.product_name ORDER BY insufficient_count DESC",0,1,0,2668.02,,
+UW073,사기탐지,challenging,low,1,text2sql,"SELECT sc.channel_type, COUNT(c.contract_id) AS contract_count
+FROM contracts c
+JOIN contract_bundles cb ON c.contract_id = cb.main_contract_id
+JOIN products p ON c.product_id = p.product_id
+JOIN sales_channels sc ON c.contract_id = sc.contract_id
+WHERE p.product_category = 'medical' AND p.product_type = 'actual_loss_medical'
+GROUP BY sc.channel_type;","SELECT sc.channel_type, COUNT(DISTINCT c.contract_id) AS bundled_sale_count FROM contracts c JOIN contract_bundles cb ON cb.main_contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND cb.bundled_product_id IS NOT NULL AND pr.product_group NOT IN ('group', 'travel') GROUP BY sc.channel_type ORDER BY bundled_sale_count DESC",1,0,0,1407.77,,
+UW073,사기탐지,challenging,low,2,text2sql,"SELECT sc.channel_type, COUNT(c.contract_id) AS contract_count
+FROM contracts c
+JOIN contract_bundles cb ON c.contract_id = cb.main_contract_id
+JOIN products p ON c.product_id = p.product_id
+JOIN sales_channels sc ON c.contract_id = sc.contract_id
+WHERE p.product_category = 'medical' AND p.product_type = 'actual_loss_medical'
+GROUP BY sc.channel_type;","SELECT sc.channel_type, COUNT(DISTINCT c.contract_id) AS bundled_sale_count FROM contracts c JOIN contract_bundles cb ON cb.main_contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND cb.bundled_product_id IS NOT NULL AND pr.product_group NOT IN ('group', 'travel') GROUP BY sc.channel_type ORDER BY bundled_sale_count DESC",1,0,0,1648.25,,
+UW073,사기탐지,challenging,low,3,text2sql,"SELECT sc.channel_type, COUNT(c.contract_id) AS contract_count
+FROM contracts c
+JOIN contract_bundles cb ON c.contract_id = cb.main_contract_id
+JOIN products p ON c.product_id = p.product_id
+JOIN sales_channels sc ON c.contract_id = sc.contract_id
+WHERE p.product_category = 'medical' AND p.product_type = 'actual_loss_medical'
+GROUP BY sc.channel_type;","SELECT sc.channel_type, COUNT(DISTINCT c.contract_id) AS bundled_sale_count FROM contracts c JOIN contract_bundles cb ON cb.main_contract_id = c.contract_id JOIN products pr ON c.product_id = pr.product_id JOIN sales_channels sc ON sc.contract_id = c.contract_id WHERE pr.product_type = 'actual_loss_medical' AND pr.medical_insurance_subtype = 'basic' AND cb.bundled_product_id IS NOT NULL AND pr.product_group NOT IN ('group', 'travel') GROUP BY sc.channel_type ORDER BY bundled_sale_count DESC",1,0,0,1630.89,,
+UW074,보험료산출,moderate,low,1,text2sql,"SELECT product_type, 
+       AVG(declared_rate_including_unrealized) AS avg_rate_including_unrealized, 
+       AVG(declared_rate_excluding_unrealized) AS avg_rate_excluding_unrealized
+FROM declared_rate_info
+JOIN products ON declared_rate_info.product_id = products.product_id
+GROUP BY product_type;","SELECT pr.product_category, dri.account_type, ROUND(AVG(dri.declared_rate_excluding_unrealized), 4) AS avg_rate_excluding, ROUND(AVG(dri.declared_rate_including_unrealized), 4) AS avg_rate_including, ROUND(AVG(dri.declared_rate_including_unrealized - dri.declared_rate_excluding_unrealized), 4) AS avg_rate_diff FROM declared_rate_info dri JOIN products pr ON pr.product_id = dri.product_id WHERE dri.rate_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) GROUP BY pr.product_category, dri.account_type ORDER BY avg_rate_diff DESC",0,7,0,1308.7,,
+UW074,보험료산출,moderate,low,2,text2sql,"SELECT product_type, 
+       AVG(declared_rate_including_unrealized) AS avg_rate_including_unrealized, 
+       AVG(declared_rate_excluding_unrealized) AS avg_rate_excluding_unrealized
+FROM declared_rate_info
+JOIN products ON declared_rate_info.product_id = products.product_id
+GROUP BY product_type;","SELECT pr.product_category, dri.account_type, ROUND(AVG(dri.declared_rate_excluding_unrealized), 4) AS avg_rate_excluding, ROUND(AVG(dri.declared_rate_including_unrealized), 4) AS avg_rate_including, ROUND(AVG(dri.declared_rate_including_unrealized - dri.declared_rate_excluding_unrealized), 4) AS avg_rate_diff FROM declared_rate_info dri JOIN products pr ON pr.product_id = dri.product_id WHERE dri.rate_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) GROUP BY pr.product_category, dri.account_type ORDER BY avg_rate_diff DESC",0,7,0,3674.34,,
+UW074,보험료산출,moderate,low,3,text2sql,"SELECT product_type, 
+       AVG(declared_rate_including_unrealized) AS avg_rate_including_unrealized, 
+       AVG(declared_rate_excluding_unrealized) AS avg_rate_excluding_unrealized
+FROM declared_rate_info
+JOIN products ON declared_rate_info.product_id = products.product_id
+GROUP BY product_type;","SELECT pr.product_category, dri.account_type, ROUND(AVG(dri.declared_rate_excluding_unrealized), 4) AS avg_rate_excluding, ROUND(AVG(dri.declared_rate_including_unrealized), 4) AS avg_rate_including, ROUND(AVG(dri.declared_rate_including_unrealized - dri.declared_rate_excluding_unrealized), 4) AS avg_rate_diff FROM declared_rate_info dri JOIN products pr ON pr.product_id = dri.product_id WHERE dri.rate_year = CAST(STRFTIME('%Y', 'now') AS INTEGER) GROUP BY pr.product_category, dri.account_type ORDER BY avg_rate_diff DESC",0,7,0,1872.02,,
+UW075,보험료산출,challenging,low,1,text2sql,"SELECT * 
+FROM products 
+WHERE product_category = 'savings' 
+AND payment_period_years >= 7 
+AND front_loaded_cost_ratio >= 0.5;","SELECT pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio, COUNT(c.contract_id) AS active_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND pr.front_loaded_cost_ratio > 0.50 AND pr.contract_cost_distribution_type != 'uniform' GROUP BY pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio ORDER BY pr.front_loaded_cost_ratio DESC",0,1,1,1014.5,,
+UW075,보험료산출,challenging,low,2,text2sql,"SELECT * 
+FROM products 
+WHERE product_category = 'savings' 
+AND payment_period_years >= 7 
+AND front_loaded_cost_ratio >= 0.5;","SELECT pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio, COUNT(c.contract_id) AS active_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND pr.front_loaded_cost_ratio > 0.50 AND pr.contract_cost_distribution_type != 'uniform' GROUP BY pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio ORDER BY pr.front_loaded_cost_ratio DESC",0,1,1,1094.47,,
+UW075,보험료산출,challenging,low,3,text2sql,"SELECT * 
+FROM products 
+WHERE product_category = 'savings' 
+AND payment_period_years >= 7 
+AND front_loaded_cost_ratio >= 0.5;","SELECT pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio, COUNT(c.contract_id) AS active_count FROM products pr LEFT JOIN contracts c ON c.product_id = pr.product_id AND c.contract_status = 'active' WHERE pr.product_category = 'savings' AND pr.payment_period_years >= 7 AND pr.front_loaded_cost_ratio > 0.50 AND pr.contract_cost_distribution_type != 'uniform' GROUP BY pr.product_id, pr.product_name, pr.payment_period_years, pr.front_loaded_cost_ratio ORDER BY pr.front_loaded_cost_ratio DESC",0,1,1,1030.87,,
+UW076,보험금지급,moderate,high,1,text2sql,"SELECT strftime('%Y', c.termination_date) AS year, COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.claim_type = '사망보험금'
+  AND cl.paid_amount < c.total_paid_premium
+  AND c.annuity_start_date IS NOT NULL
+  AND c.termination_date IS NOT NULL
+GROUP BY year;","SELECT STRFTIME('%Y', cl.claim_date) AS claim_year, COUNT(cl.claim_id) AS case_count, SUM(cl.paid_amount) AS total_death_benefit, SUM(c.total_paid_premium) AS total_paid_premium FROM claims cl JOIN contracts c ON c.contract_id = cl.contract_id JOIN insured i ON i.insured_id = c.insured_id JOIN products pr ON c.product_id = pr.product_id WHERE cl.claim_type = 'death' AND pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND i.death_date > c.annuity_start_date AND cl.paid_amount < c.total_paid_premium GROUP BY STRFTIME('%Y', cl.claim_date) ORDER BY claim_year",1,0,0,1880.34,,
+UW076,보험금지급,moderate,high,2,text2sql,"SELECT strftime('%Y', c.termination_date) AS year, COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.claim_type = '사망보험금'
+  AND cl.paid_amount < c.total_paid_premium
+  AND c.annuity_start_date IS NOT NULL
+  AND cl.claim_status = '지급완료'
+GROUP BY year;","SELECT STRFTIME('%Y', cl.claim_date) AS claim_year, COUNT(cl.claim_id) AS case_count, SUM(cl.paid_amount) AS total_death_benefit, SUM(c.total_paid_premium) AS total_paid_premium FROM claims cl JOIN contracts c ON c.contract_id = cl.contract_id JOIN insured i ON i.insured_id = c.insured_id JOIN products pr ON c.product_id = pr.product_id WHERE cl.claim_type = 'death' AND pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND i.death_date > c.annuity_start_date AND cl.paid_amount < c.total_paid_premium GROUP BY STRFTIME('%Y', cl.claim_date) ORDER BY claim_year",1,0,0,1763.24,,
+UW076,보험금지급,moderate,high,3,text2sql,"SELECT strftime('%Y', c.termination_date) AS year, COUNT(*) AS count
+FROM contracts c
+JOIN claims cl ON c.contract_id = cl.contract_id
+WHERE cl.claim_type = '사망보험금'
+  AND cl.paid_amount < c.total_paid_premium
+  AND c.annuity_start_date IS NOT NULL
+  AND cl.claim_status = '지급완료'
+GROUP BY year;","SELECT STRFTIME('%Y', cl.claim_date) AS claim_year, COUNT(cl.claim_id) AS case_count, SUM(cl.paid_amount) AS total_death_benefit, SUM(c.total_paid_premium) AS total_paid_premium FROM claims cl JOIN contracts c ON c.contract_id = cl.contract_id JOIN insured i ON i.insured_id = c.insured_id JOIN products pr ON c.product_id = pr.product_id WHERE cl.claim_type = 'death' AND pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND i.death_date > c.annuity_start_date AND cl.paid_amount < c.total_paid_premium GROUP BY STRFTIME('%Y', cl.claim_date) ORDER BY claim_year",1,0,0,2048.99,,
+UW077,보험료산출,challenging,low,1,text2sql,"SELECT 
+    payment_year_elapsed, 
+    COUNT(*) AS contract_count 
+FROM 
+    contracts 
+WHERE 
+    low_surrender_value_type = 1 
+    AND surrender_value < standard_surrender_value * 0.5 
+GROUP BY 
+    payment_year_elapsed;","SELECT c.payment_year_elapsed, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.surrender_value), 0) AS avg_surrender, ROUND(AVG(c.surrender_value_standard_type), 0) AS avg_surrender_standard, ROUND(AVG(100.0 * c.surrender_value / NULLIF(c.surrender_value_standard_type, 0)), 2) AS avg_ratio_pct FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.low_surrender_value_type = 1 AND c.payment_year_elapsed < pr.payment_period_years AND c.contract_status = 'active' GROUP BY c.payment_year_elapsed ORDER BY c.payment_year_elapsed",0,0,0,1238.16,,pred_sql 오류: no such column: low_surrender_value_type
+UW077,보험료산출,challenging,low,2,text2sql,"SELECT 
+    payment_year_elapsed,
+    COUNT(*) AS contract_count,
+    SUM(surrender_value) AS total_surrender_value
+FROM 
+    contracts
+WHERE 
+    low_surrender_value_type = 1 AND 
+    surrender_value < standard_surrender_value * 0.5
+GROUP BY 
+    payment_year_elapsed;","SELECT c.payment_year_elapsed, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.surrender_value), 0) AS avg_surrender, ROUND(AVG(c.surrender_value_standard_type), 0) AS avg_surrender_standard, ROUND(AVG(100.0 * c.surrender_value / NULLIF(c.surrender_value_standard_type, 0)), 2) AS avg_ratio_pct FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.low_surrender_value_type = 1 AND c.payment_year_elapsed < pr.payment_period_years AND c.contract_status = 'active' GROUP BY c.payment_year_elapsed ORDER BY c.payment_year_elapsed",0,0,0,1472.81,,pred_sql 오류: no such column: low_surrender_value_type
+UW077,보험료산출,challenging,low,3,text2sql,"SELECT 
+    payment_year_elapsed, 
+    COUNT(*) AS contract_count 
+FROM 
+    contracts 
+WHERE 
+    low_surrender_value_type = 1 
+    AND surrender_value < standard_surrender_value * 0.5 
+GROUP BY 
+    payment_year_elapsed;","SELECT c.payment_year_elapsed, COUNT(c.contract_id) AS contract_count, ROUND(AVG(c.surrender_value), 0) AS avg_surrender, ROUND(AVG(c.surrender_value_standard_type), 0) AS avg_surrender_standard, ROUND(AVG(100.0 * c.surrender_value / NULLIF(c.surrender_value_standard_type, 0)), 2) AS avg_ratio_pct FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.low_surrender_value_type = 1 AND c.payment_year_elapsed < pr.payment_period_years AND c.contract_status = 'active' GROUP BY c.payment_year_elapsed ORDER BY c.payment_year_elapsed",0,0,0,1446.5,,pred_sql 오류: no such column: low_surrender_value_type
+UW078,보험료산출,challenging,medium,1,text2sql,"SELECT 
+    c.contract_id,
+    c.product_id,
+    c.renewal_contract_cost,
+    c.contract_cost_index
+FROM 
+    contract_revivals c
+JOIN 
+    contracts co ON c.contract_id = co.contract_id
+WHERE 
+    c.relative_rate_applied = 1 
+    AND c.renewal_contract_cost > (co.contract_cost_index * 1.7);","SELECT pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost, ROUND(100.0 * rh.renewal_contract_cost / rh.original_contract_cost, 2) AS cost_ratio_pct, COUNT(c.contract_id) AS renewed_count FROM contract_revivals rh JOIN products pr ON pr.product_id = rh.product_id JOIN contracts c ON c.contract_id = rh.renewed_contract_id WHERE pr.auto_renewal_flag = 1 AND rh.renewal_contract_cost > rh.original_contract_cost * 0.70 AND c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost ORDER BY cost_ratio_pct DESC",0,0,0,1636.84,,pred_sql 오류: no such column: c.contract_cost_index
+UW078,보험료산출,challenging,medium,2,text2sql,"SELECT 
+    c.contract_id,
+    COUNT(cr.renewed_contract_id) AS renewal_count
+FROM 
+    contracts c
+JOIN 
+    contract_revivals cr ON c.contract_id = cr.contract_id
+WHERE 
+    cr.premium_after_renewal > (c.contract_conclusion_cost * 1.7)
+    AND c.contract_status = 'active'
+GROUP BY 
+    c.contract_id;","SELECT pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost, ROUND(100.0 * rh.renewal_contract_cost / rh.original_contract_cost, 2) AS cost_ratio_pct, COUNT(c.contract_id) AS renewed_count FROM contract_revivals rh JOIN products pr ON pr.product_id = rh.product_id JOIN contracts c ON c.contract_id = rh.renewed_contract_id WHERE pr.auto_renewal_flag = 1 AND rh.renewal_contract_cost > rh.original_contract_cost * 0.70 AND c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost ORDER BY cost_ratio_pct DESC",0,0,0,1745.04,,pred_sql 오류: no such column: c.contract_conclusion_cost
+UW078,보험료산출,challenging,medium,3,text2sql,"SELECT 
+    c.contract_id,
+    COUNT(cr.renewed_contract_id) AS renewal_count
+FROM 
+    contracts c
+JOIN 
+    contract_revivals cr ON c.contract_id = cr.contract_id
+WHERE 
+    cr.premium_after_renewal > (c.contract_conclusion_cost * 1.7)
+    AND c.contract_status = 'active'
+GROUP BY 
+    c.contract_id;","SELECT pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost, ROUND(100.0 * rh.renewal_contract_cost / rh.original_contract_cost, 2) AS cost_ratio_pct, COUNT(c.contract_id) AS renewed_count FROM contract_revivals rh JOIN products pr ON pr.product_id = rh.product_id JOIN contracts c ON c.contract_id = rh.renewed_contract_id WHERE pr.auto_renewal_flag = 1 AND rh.renewal_contract_cost > rh.original_contract_cost * 0.70 AND c.contract_status = 'active' GROUP BY pr.product_id, pr.product_name, rh.renewal_date, rh.original_contract_cost, rh.renewal_contract_cost ORDER BY cost_ratio_pct DESC",0,0,0,1685.69,,pred_sql 오류: no such column: c.contract_conclusion_cost
+UW079,장해리스크,challenging,medium,1,text2sql,"SELECT 
+    i.gender,
+    COUNT(DISTINCT c.insured_id) AS insured_count,
+    SUM(c.current_monthly_premium_krw) AS total_monthly_premium
+FROM 
+    contracts c
+JOIN 
+    insured i ON c.insured_id = i.insured_id
+JOIN 
+    exchange_rate_history e ON c.currency_code = e.currency_code
+WHERE 
+    c.contract_type = 'foreign_currency' 
+    AND (c.current_monthly_premium_krw / c.original_premium) > 1.1
+GROUP BY 
+    i.gender;","SELECT c.currency_code, COUNT(DISTINCT c.insured_id) AS insured_count, SUM(c.current_monthly_premium_krw) AS total_current_premium_krw FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN exchange_rate_history er_c ON er_c.currency_code = c.currency_code AND er_c.rate_date = c.contract_date JOIN exchange_rate_history er_n ON er_n.currency_code = c.currency_code AND er_n.rate_date = DATE('now') WHERE pr.product_type = 'foreign_currency' AND c.contract_status = 'active' AND (er_n.rate / er_c.rate) >= 1.10 GROUP BY c.currency_code ORDER BY total_current_premium_krw DESC",1,0,0,1957.97,,
+UW079,장해리스크,challenging,medium,2,text2sql,"SELECT 
+    i.gender,
+    COUNT(DISTINCT c.insured_id) AS insured_count,
+    SUM(c.current_monthly_premium_krw) AS total_current_monthly_premium
+FROM 
+    contracts c
+JOIN 
+    insured i ON c.insured_id = i.insured_id
+JOIN 
+    exchange_rate_history e ON c.currency_code = e.currency_code
+WHERE 
+    c.contract_status = 'active' 
+    AND (c.current_monthly_premium_krw / c.original_premium) > 1.1
+GROUP BY 
+    i.gender;","SELECT c.currency_code, COUNT(DISTINCT c.insured_id) AS insured_count, SUM(c.current_monthly_premium_krw) AS total_current_premium_krw FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN exchange_rate_history er_c ON er_c.currency_code = c.currency_code AND er_c.rate_date = c.contract_date JOIN exchange_rate_history er_n ON er_n.currency_code = c.currency_code AND er_n.rate_date = DATE('now') WHERE pr.product_type = 'foreign_currency' AND c.contract_status = 'active' AND (er_n.rate / er_c.rate) >= 1.10 GROUP BY c.currency_code ORDER BY total_current_premium_krw DESC",0,1,0,3032.19,,
+UW079,장해리스크,challenging,medium,3,text2sql,"SELECT 
+    i.gender,
+    COUNT(DISTINCT c.insured_id) AS insured_count,
+    SUM(c.current_monthly_premium_krw) AS total_current_monthly_premium
+FROM 
+    contracts c
+JOIN 
+    insured i ON c.insured_id = i.insured_id
+JOIN 
+    exchange_rate_history e ON c.currency_code = e.currency_code
+WHERE 
+    c.current_monthly_premium_krw > (c.original_premium * 1.1)
+GROUP BY 
+    i.gender;","SELECT c.currency_code, COUNT(DISTINCT c.insured_id) AS insured_count, SUM(c.current_monthly_premium_krw) AS total_current_premium_krw FROM contracts c JOIN products pr ON c.product_id = pr.product_id JOIN exchange_rate_history er_c ON er_c.currency_code = c.currency_code AND er_c.rate_date = c.contract_date JOIN exchange_rate_history er_n ON er_n.currency_code = c.currency_code AND er_n.rate_date = DATE('now') WHERE pr.product_type = 'foreign_currency' AND c.contract_status = 'active' AND (er_n.rate / er_c.rate) >= 1.10 GROUP BY c.currency_code ORDER BY total_current_premium_krw DESC",0,1,0,1696.27,,
+UW080,보험금지급,moderate,medium,1,text2sql,"SELECT AVG(julianday(insurance_event_date) - julianday(annuity_start_date)) AS average_annuity_period,
+       COUNT(*) AS current_annuitants
+FROM contracts
+WHERE coverage_type = '연금' AND contract_status = 'active' AND annuity_start_date IS NOT NULL;","SELECT COUNT(DISTINCT c.insured_id) AS receiving_count, ROUND(AVG(CAST(JULIANDAY('now') - JULIANDAY(c.annuity_start_date) AS REAL) / 365.25), 1) AS avg_payment_years FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND c.annuity_start_date <= DATE('now') AND c.contract_status = 'active' AND pr.post_annuity_death_benefit_flag = 1",0,0,1,1358.56,,pred_sql 오류: no such column: insurance_event_date
+UW080,보험금지급,moderate,medium,2,text2sql,"SELECT AVG(julianday(insurance_event_date) - julianday(annuity_start_date)) AS average_annuity_period,
+       COUNT(*) AS current_annuitants
+FROM contracts
+WHERE coverage_type = '연금' AND contract_status = 'active' AND annuity_start_date IS NOT NULL;","SELECT COUNT(DISTINCT c.insured_id) AS receiving_count, ROUND(AVG(CAST(JULIANDAY('now') - JULIANDAY(c.annuity_start_date) AS REAL) / 365.25), 1) AS avg_payment_years FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND c.annuity_start_date <= DATE('now') AND c.contract_status = 'active' AND pr.post_annuity_death_benefit_flag = 1",0,0,1,1300.0,,pred_sql 오류: no such column: insurance_event_date
+UW080,보험금지급,moderate,medium,3,text2sql,"SELECT AVG(julianday(insurance_event_date) - julianday(annuity_start_date)) AS average_annuity_period,
+       COUNT(*) AS current_insured_count
+FROM contracts
+WHERE coverage_type = '연금' AND contract_status = 'active' AND annuity_start_date IS NOT NULL;","SELECT COUNT(DISTINCT c.insured_id) AS receiving_count, ROUND(AVG(CAST(JULIANDAY('now') - JULIANDAY(c.annuity_start_date) AS REAL) / 365.25), 1) AS avg_payment_years FROM contracts c JOIN products pr ON c.product_id = pr.product_id WHERE pr.product_category = 'annuity' AND c.annuity_start_date IS NOT NULL AND c.annuity_start_date <= DATE('now') AND c.contract_status = 'active' AND pr.post_annuity_death_benefit_flag = 1",0,0,1,1457.06,,pred_sql 오류: no such column: insurance_event_date

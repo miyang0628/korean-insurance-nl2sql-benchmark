@@ -1,0 +1,773 @@
+[
+  {
+    "question_id": "UW001",
+    "question_ko": "고지의무 위반으로 계약이 해지된 피보험자 수는 총 몇 명인가?",
+    "category": "고지의무",
+    "difficulty": "simple",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "계약해지이력",
+      "위반사실"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제14조(계약 전 알릴 의무 위반의 효과) 제1항",
+      "content": "회사는 계약자 또는 피보험자가 고의 또는 중대한 과실로 중요한 사항에 대하여 사실과 다르게 알린 경우 계약을 해지하거나 보장을 제한할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(DISTINCT insured_id) FROM contracts WHERE termination_reason = '고지의무위반'"
+  },
+  {
+    "question_id": "UW002",
+    "question_ko": "최근 3년간 고지의무 위반으로 계약이 해지된 건수의 연도별 추이는?",
+    "category": "고지의무",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "계약해지이력",
+      "위반사실"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제14조(계약 전 알릴 의무 위반의 효과) 제1항",
+      "content": "회사는 계약자 또는 피보험자가 고의 또는 중대한 과실로 중요한 사항에 대하여 사실과 다르게 알린 경우 계약을 해지할 수 있다"
+    },
+    "gold_sql": "SELECT STRFTIME('%Y', termination_date) AS year, COUNT(*) AS cnt FROM contracts WHERE termination_reason = '고지의무위반' AND termination_date >= DATE('now', '-3 years') GROUP BY STRFTIME('%Y', termination_date) ORDER BY year"
+  },
+  {
+    "question_id": "UW003",
+    "question_ko": "고지의무 위반 사실이 보험금 지급사유 발생에 영향을 미쳤음이 입증된 계약 건수는?",
+    "category": "고지의무",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "계약해지이력",
+      "위반사실",
+      "보험금지급사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제14조(계약 전 알릴 의무 위반의 효과) 제4항",
+      "content": "계약 전 알릴 의무를 위반한 사실이 보험금 지급사유 발생에 영향을 미쳤음을 회사가 증명하지 못한 경우에는 보험금을 지급한다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE termination_reason = '고지의무위반' AND causation_proven = 1"
+  },
+  {
+    "question_id": "UW004",
+    "question_ko": "청약일 기준 5년 이내 동일 질병으로 추가 진단 또는 치료 이력이 있는 피보험자 수는?",
+    "category": "고지의무",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "진단명",
+      "치료이력",
+      "병력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제4조(보험금 지급에 관한 세부규정) 제5항",
+      "content": "청약일 이전에 진단 확정된 질병이라도 청약일 이후 5년이 지나는 동안 추가 진단 또는 치료 사실이 없을 경우 보장한다"
+    },
+    "gold_sql": "SELECT COUNT(DISTINCT insured_id) FROM medical_history WHERE treatment_date BETWEEN contract_date AND DATE(contract_date, '+5 years') AND diagnosis_code = prior_diagnosis_code"
+  },
+  {
+    "question_id": "UW005",
+    "question_ko": "대리진단 또는 진단서 위변조로 계약이 취소된 건수는?",
+    "category": "사기탐지",
+    "difficulty": "simple",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사기이력",
+      "계약취소사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제15조(사기에 의한 계약)",
+      "content": "계약자 또는 피보험자가 대리진단, 약물사용을 수단으로 진단절차를 통과하거나 진단서 위변조 등 뚜렷한 사기의사에 의하여 계약이 성립된 경우 취소할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE cancellation_reason IN ('대리진단', '진단서위변조', '사기')"
+  },
+  {
+    "question_id": "UW006",
+    "question_ko": "보장개시일로부터 5년 이내에 사기 사실이 발각되어 취소된 계약의 비율은?",
+    "category": "사기탐지",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사기이력",
+      "계약취소사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제15조(사기에 의한 계약)",
+      "content": "보장개시일부터 5년 이내(사기사실을 안 날부터는 1개월 이내)에 계약을 취소할 수 있다"
+    },
+    "gold_sql": "SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(termination_date) - JULIANDAY(coverage_start_date) AS INTEGER) <= 1825 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contracts WHERE cancellation_reason = '사기'"
+  },
+  {
+    "question_id": "UW007",
+    "question_ko": "피보험자가 계약에 적합하지 않아 승낙이 거절된 건수와 조건부 승낙된 건수를 비교하면?",
+    "category": "계약심사",
+    "difficulty": "simple",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "심사결과",
+      "거절사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제16조(보험계약의 성립) 제2항",
+      "content": "회사는 피보험자가 계약에 적합하지 않은 경우 승낙을 거절하거나 별도의 조건(보험가입금액 제한, 일부보장 제외, 보험금 삭감, 보험료 할증 등)을 붙여 승낙할 수 있다"
+    },
+    "gold_sql": "SELECT decision_type, COUNT(*) AS cnt FROM underwriting_decisions WHERE decision_type IN ('거절', '조건부승낙') GROUP BY decision_type"
+  },
+  {
+    "question_id": "UW008",
+    "question_ko": "보험료 할증 조건으로 승낙된 계약의 평균 할증률은?",
+    "category": "보험료산출",
+    "difficulty": "simple",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "보험료정보",
+      "심사결과"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제16조(보험계약의 성립) 제2항",
+      "content": "회사는 피보험자가 계약에 적합하지 않은 경우 보험료 할증 등의 조건을 붙여 승낙할 수 있다"
+    },
+    "gold_sql": "SELECT AVG(premium_surcharge_rate) FROM underwriting_decisions WHERE decision_type = '조건부승낙' AND condition_type = '보험료할증'"
+  },
+  {
+    "question_id": "UW009",
+    "question_ko": "일부보장 제외 조건으로 승낙된 계약에서 제외된 보장 유형별 건수는?",
+    "category": "계약심사",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "보장제외내역",
+      "심사결과"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제16조(보험계약의 성립) 제2항",
+      "content": "회사는 피보험자가 계약에 적합하지 않은 경우 일부 보장 제외 등의 조건을 붙여 승낙할 수 있다"
+    },
+    "gold_sql": "SELECT exclusion_type, COUNT(*) AS cnt FROM contract_exclusions GROUP BY exclusion_type ORDER BY cnt DESC"
+  },
+  {
+    "question_id": "UW010",
+    "question_ko": "진단계약에서 건강진단 없이 보험금 지급사유가 발생하여 보장이 거절된 건수는?",
+    "category": "계약심사",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "진단정보",
+      "보험금지급사유",
+      "건강상태"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제23조(제1회 보험료 및 회사의 보장개시) 제3항 제3호",
+      "content": "진단계약에서 보험금 지급사유가 발생할 때까지 진단을 받지 않은 경우 보장하지 않는다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.contract_type = '진단계약' AND ct.health_exam_completed = 0 AND c.claim_status = '지급거절'"
+  },
+  {
+    "question_id": "UW011",
+    "question_ko": "사망보험금이 지급된 계약 중 보장개시일로부터 2년 이내 자살로 지급이 거절된 건수는?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사망원인",
+      "보험금지급사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제5조(보험금을 지급하지 않는 사유) 제1항 나호",
+      "content": "계약의 보장개시일부터 2년이 지난 후에 자살한 경우에는 재해 이외의 원인에 해당하는 사망보험금을 지급한다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '사망보험금' AND cl.death_cause = '자살' AND CAST(JULIANDAY(cl.claim_date) - JULIANDAY(ct.coverage_start_date) AS INTEGER) < 730 AND cl.claim_status = '지급거절'"
+  },
+  {
+    "question_id": "UW012",
+    "question_ko": "보험금 지급사유 조사에 동의하지 않아 지급이 지연된 건수와 평균 지연 일수는?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "보험금지급이력",
+      "조사동의여부"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제8조(보험금의 지급절차) 제6항",
+      "content": "계약자, 피보험자 또는 보험수익자는 의료기관, 국민건강보험공단, 경찰서 등 관공서에 대한 회사의 서면 조사 요청에 동의하여야 한다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(actual_payment_date) - JULIANDAY(claim_date) AS INTEGER)) AS avg_delay_days FROM claims WHERE investigation_consent = 0 AND actual_payment_date IS NOT NULL"
+  },
+  {
+    "question_id": "UW013",
+    "question_ko": "장해보험금 청구 건 중 180일 이내 장해지급률이 확정되지 않아 의사 진단으로 결정된 건수는?",
+    "category": "장해리스크",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단정보",
+      "건강상태"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제4조(보험금 지급에 관한 세부규정) 제2항",
+      "content": "장해지급률이 재해일 또는 질병의 진단 확정일부터 180일 이내에 확정되지 않는 경우에는 180일이 되는 날의 의사 진단에 기초하여 결정한다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims WHERE claim_type = '장해보험금' AND disability_rate_fixed_days > 180"
+  },
+  {
+    "question_id": "UW014",
+    "question_ko": "장해분류표 기준 지급률 100%에 해당하는 심각한 장해 건수와 평균 보험금 지급액은?",
+    "category": "장해리스크",
+    "difficulty": "simple",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 팔의 장해",
+      "content": "두 팔의 손목 이상을 잃었을 때: 지급률 100%"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(paid_amount) AS avg_paid FROM claims WHERE disability_payment_rate = 100 AND claim_type = '장해보험금'"
+  },
+  {
+    "question_id": "UW015",
+    "question_ko": "척추 장해 중 심한 추간판탈출증(디스크)으로 청구된 보험금의 총액은?",
+    "category": "장해리스크",
+    "difficulty": "simple",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단명",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 척추(등뼈)의 장해",
+      "content": "심한 추간판탈출증(속칭 디스크): 지급률 20%"
+    },
+    "gold_sql": "SELECT SUM(paid_amount) FROM claims WHERE disability_type = '심한추간판탈출증' AND claim_type = '장해보험금'"
+  },
+  {
+    "question_id": "UW016",
+    "question_ko": "눈의 장해로 지급된 보험금 건수를 장해 분류별로 집계하면?",
+    "category": "장해리스크",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단명",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 눈의 장해",
+      "content": "두 눈이 멀었을 때 100%, 한 눈이 멀었을 때 50%, 교정시력 0.02 이하 35% 등"
+    },
+    "gold_sql": "SELECT disability_subtype, COUNT(*) AS cnt, SUM(paid_amount) AS total FROM claims WHERE disability_body_part = '눈' AND claim_type = '장해보험금' GROUP BY disability_subtype ORDER BY cnt DESC"
+  },
+  {
+    "question_id": "UW017",
+    "question_ko": "신경계·정신행동 장해로 청구된 건 중 CDR 척도 3점 이상(뚜렷한 치매) 해당 건수는?",
+    "category": "장해리스크",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단명",
+      "정신건강정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 신경계·정신행동 장해",
+      "content": "뚜렷한 치매: CDR 척도 3점(60%), 심한 치매: CDR 척도 4점(80%), 극심한 치매: CDR 척도 5점(100%)"
+    },
+    "gold_sql": "SELECT cdr_score, COUNT(*) AS cnt FROM claims WHERE disability_type = '치매' AND cdr_score >= 3 GROUP BY cdr_score ORDER BY cdr_score"
+  },
+  {
+    "question_id": "UW018",
+    "question_ko": "보험나이 기준 40세 이상 피보험자의 장해보험금 청구 비율은 전체의 몇 %인가?",
+    "category": "장해리스크",
+    "difficulty": "simple",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "나이정보",
+      "보험금지급이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제21조(보험나이 등)",
+      "content": "보험나이는 계약일 현재 피보험자의 실제 만 나이를 기준으로 6개월 미만의 끝수는 버리고 6개월 이상의 끝수는 1년으로 하여 계산한다"
+    },
+    "gold_sql": "SELECT ROUND(COUNT(CASE WHEN ct.insurance_age >= 40 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM claims cl JOIN contracts ct ON cl.contract_id = ct.contract_id WHERE cl.claim_type = '장해보험금'"
+  },
+  {
+    "question_id": "UW019",
+    "question_ko": "만 15세 미만 피보험자를 대상으로 한 사망보험금 계약 중 무효 처리된 건수는?",
+    "category": "계약심사",
+    "difficulty": "simple",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "나이정보",
+      "계약무효사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제19조(계약의 무효) 제2호",
+      "content": "만 15세 미만자, 심신상실자 또는 심신박약자를 피보험자로 하여 사망을 보험금 지급사유로 한 계약의 경우 무효로 한다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE insured_age_at_contract < 15 AND coverage_type = '사망' AND contract_status = '무효'"
+  },
+  {
+    "question_id": "UW020",
+    "question_ko": "타인의 사망을 보험금 지급사유로 하는 계약에서 피보험자 서면 동의 없이 체결되어 무효 처리된 건수는?",
+    "category": "계약심사",
+    "difficulty": "simple",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "계약무효사유",
+      "동의여부"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제19조(계약의 무효) 제1호",
+      "content": "타인의 사망을 보험금 지급사유로 하는 계약에서 계약을 체결할 때까지 피보험자의 서면에 의한 동의를 얻지 않은 경우 무효로 한다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE third_party_death_coverage = 1 AND insured_written_consent = 0 AND contract_status = '무효'"
+  },
+  {
+    "question_id": "UW021",
+    "question_ko": "보험료 납입 연체로 계약이 해지된 후 3년 이내 부활(효력회복)을 신청한 건수는?",
+    "category": "계약관리",
+    "difficulty": "simple",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "계약상태이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제27조(보험료의 납입연체로 인한 해지계약의 부활) 제1항",
+      "content": "계약이 해지되었으나 해지환급금을 받지 않은 경우 계약자는 해지된 날부터 3년 이내에 계약의 부활을 청약할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contract_revivals WHERE CAST(JULIANDAY(revival_application_date) - JULIANDAY(termination_date) AS INTEGER) <= 1095"
+  },
+  {
+    "question_id": "UW022",
+    "question_ko": "보험계약대출 잔액이 해지환급금의 90% 이상인 계약의 건수와 평균 대출 금액은?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "대출정보",
+      "재무정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제33조(보험계약대출) 제1항",
+      "content": "계약자는 이 계약의 해지환급금 범위 내에서 회사가 정한 방법에 따라 대출을 받을 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(loan_balance) AS avg_loan FROM contracts WHERE loan_balance >= surrender_value * 0.9 AND contract_status = '유효'"
+  },
+  {
+    "question_id": "UW023",
+    "question_ko": "보험금청구권 소멸시효 3년이 경과하여 청구권이 소멸된 건수는?",
+    "category": "보험금지급",
+    "difficulty": "simple",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "청구이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제37조(소멸시효)",
+      "content": "보험금청구권은 3년간 행사하지 않으면 소멸시효가 완성된다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims WHERE claim_status = '소멸시효완성' AND CAST(JULIANDAY(claim_expiry_date) - JULIANDAY(insurance_event_date) AS INTEGER) <= 1095"
+  },
+  {
+    "question_id": "UW024",
+    "question_ko": "보험금 지급 결정 후 30영업일을 초과하여 지급된 건수와 해당 가산이율 발생 총액은?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "보험금지급이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표4-1 보험금을 지급할 때의 적립이율 계산",
+      "content": "지급기일의 31일이후부터 60일이내 기간: 보험계약대출이율 + 가산이율(4.0%)"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, SUM(additional_interest_amount) AS total_interest FROM claims WHERE CAST(JULIANDAY(actual_payment_date) - JULIANDAY(due_payment_date) AS INTEGER) > 30 AND claim_status = '지급완료'"
+  },
+  {
+    "question_id": "UW025",
+    "question_ko": "입원보험금 청구 건 중 보험수익자와 계약자가 고의로 보험금 지급사유를 발생시켜 중대사유로 해지된 건수는?",
+    "category": "사기탐지",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사기이력",
+      "보험금지급사유",
+      "계약해지사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제30조(중대사유로 인한 해지) 제1항 제1호",
+      "content": "계약자, 피보험자 또는 보험수익자가 고의로 보험금 지급사유를 발생시킨 경우 회사는 그 사실을 안 날부터 1개월 이내에 계약을 해지할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE termination_reason = '중대사유' AND fraud_type = '고의보험사고유발'"
+  },
+  {
+    "question_id": "UW026",
+    "question_ko": "청구서류 위조·변조로 중대사유 해지된 계약에서 이미 지급된 보험금 총액은?",
+    "category": "사기탐지",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사기이력",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제30조(중대사유로 인한 해지) 제1항 제2호",
+      "content": "계약자, 피보험자 또는 보험수익자가 보험금 청구에 관한 서류에 고의로 사실과 다른 것을 기재하였거나 위조 또는 변조한 경우"
+    },
+    "gold_sql": "SELECT SUM(c.paid_amount) FROM claims c JOIN contracts ct ON c.contract_id = ct.contract_id WHERE ct.termination_reason = '중대사유' AND ct.fraud_type = '서류위변조'"
+  },
+  {
+    "question_id": "UW027",
+    "question_ko": "보험종목별 조건부 승낙(보험료 할증, 보장 제외, 보험금 삭감) 건수 분포는?",
+    "category": "계약심사",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "심사결과",
+      "보험종목"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제16조(보험계약의 성립) 제2항",
+      "content": "회사는 피보험자가 계약에 적합하지 않은 경우 보험가입금액 제한, 일부보장 제외, 보험금 삭감, 보험료 할증 등의 조건을 붙여 승낙할 수 있다"
+    },
+    "gold_sql": "SELECT pr.product_category, ud.condition_type, COUNT(*) AS cnt FROM underwriting_decisions ud JOIN contracts ct ON ud.contract_id = ct.contract_id JOIN products pr ON ct.product_id = pr.product_id WHERE ud.decision_type = '조건부승낙' GROUP BY pr.product_category, ud.condition_type ORDER BY pr.product_category, cnt DESC"
+  },
+  {
+    "question_id": "UW028",
+    "question_ko": "흉복부장기 기능에 심한 장해(장기이식 포함)로 지급된 보험금의 평균액과 최대액은?",
+    "category": "장해리스크",
+    "difficulty": "simple",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단명",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 흉복부장기 및 비뇨생식기의 장해",
+      "content": "흉복부장기 또는 비뇨생식기 기능에 심한 장해: 지급률 75%"
+    },
+    "gold_sql": "SELECT AVG(paid_amount) AS avg_paid, MAX(paid_amount) AS max_paid FROM claims WHERE disability_type = '흉복부장기심한장해' AND claim_type = '장해보험금'"
+  },
+  {
+    "question_id": "UW029",
+    "question_ko": "심한 간질발작(월 8회 이상, 연 6개월 이상)으로 장해보험금을 수령한 피보험자의 평균 연령은?",
+    "category": "장해리스크",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "진단명",
+      "나이정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 신경계·정신행동 장해",
+      "content": "심한 간질발작: 지급률 70% - 월 8회 이상의 중증발작이 연 6개월 이상 발생하고 요양관리가 필요한 상태"
+    },
+    "gold_sql": "SELECT AVG(i.insured_age) FROM claims c JOIN insured i ON c.insured_id = i.insured_id WHERE c.disability_type = '심한간질발작' AND c.claim_type = '장해보험금' AND c.claim_status = '지급완료'"
+  },
+  {
+    "question_id": "UW030",
+    "question_ko": "보험기간별(10년 미만, 10년 이상) 장해상태 악화로 장해지급률이 재결정된 건수는?",
+    "category": "장해리스크",
+    "difficulty": "challenging",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "장해등급",
+      "계약기간",
+      "건강상태"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제4조(보험금 지급에 관한 세부규정) 제3항",
+      "content": "보험기간 10년 이상인 계약은 2년 이내, 10년 미만인 계약은 1년 이내 장해상태가 악화된 때 악화된 상태를 기준으로 장해지급률을 결정한다"
+    },
+    "gold_sql": "SELECT CASE WHEN pr.insurance_period_years >= 10 THEN '10년이상' ELSE '10년미만' END AS period_group, COUNT(*) AS cnt FROM contracts ct JOIN products pr ON ct.product_id = pr.product_id WHERE ct.disability_rate_revised = 1 GROUP BY period_group"
+  },
+  {
+    "question_id": "UW031",
+    "question_ko": "보험수익자가 고의로 피보험자를 해쳐 보험금이 지급 거절된 건수는?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "보험금지급거절사유",
+      "수익자정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제5조(보험금을 지급하지 않는 사유) 제2호",
+      "content": "보험수익자가 고의로 피보험자를 해친 경우 보험금을 지급하지 않는다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '수익자고의피해' AND claim_status = '지급거절'"
+  },
+  {
+    "question_id": "UW032",
+    "question_ko": "보험계약대출 이자 미납으로 해지환급금에서 자동 차감된 계약의 월별 건수 추이는?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "대출정보",
+      "재무정보",
+      "계약상태이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제33조(보험계약대출) 제2항",
+      "content": "상환하지 않은 때에는 회사는 보험금, 해지환급금 등의 지급사유가 발생한 날에 지급금에서 보험계약대출의 원금과 이자를 차감할 수 있다"
+    },
+    "gold_sql": "SELECT STRFTIME('%Y-%m', deduction_date) AS month, COUNT(*) AS cnt FROM loan_deductions WHERE deduction_type = '해지환급금차감' GROUP BY STRFTIME('%Y-%m', deduction_date) ORDER BY month"
+  },
+  {
+    "question_id": "UW033",
+    "question_ko": "연도별 사망보험금 지급 현황(건수, 총액, 평균액)을 최근 5년간 비교하면?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "사망원인",
+      "보험금지급액"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제3조(보험금의 지급사유) 제3호",
+      "content": "보험기간 중 사망한 경우: 사망보험금"
+    },
+    "gold_sql": "SELECT STRFTIME('%Y', actual_payment_date) AS year, COUNT(*) AS cnt, SUM(paid_amount) AS total, AVG(paid_amount) AS avg_amount FROM claims WHERE claim_type = '사망보험금' AND actual_payment_date >= DATE('now', '-5 years') GROUP BY STRFTIME('%Y', actual_payment_date) ORDER BY year"
+  },
+  {
+    "question_id": "UW034",
+    "question_ko": "실종선고로 사망으로 처리된 보험금 지급 건수와 평균 실종기간은?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "사망처리사유",
+      "보험금지급이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제4조(보험금 지급에 관한 세부규정) 제1항 제1호",
+      "content": "실종선고를 받은 경우: 법원에서 인정한 실종기간이 끝나는 때에 사망한 것으로 본다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(missing_period_days) AS avg_missing_days FROM claims WHERE death_cause_type = '실종선고' AND claim_type = '사망보험금'"
+  },
+  {
+    "question_id": "UW035",
+    "question_ko": "청약 철회 건수 중 보험증권 수령일로부터 15일 이내에 철회한 비율은?",
+    "category": "계약관리",
+    "difficulty": "simple",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "계약상태이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제17조(청약의 철회) 제1항",
+      "content": "계약자는 보험증권을 받은 날부터 15일 이내에 그 청약을 철회할 수 있다"
+    },
+    "gold_sql": "SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(withdrawal_date) - JULIANDAY(policy_issue_date) AS INTEGER) <= 15 THEN 1 END) * 100.0 / COUNT(*), 2) AS pct FROM contract_withdrawals"
+  },
+  {
+    "question_id": "UW036",
+    "question_ko": "약관 미교부 또는 중요내용 미설명을 이유로 계약 성립일로부터 3개월 이내에 취소된 건수는?",
+    "category": "계약관리",
+    "difficulty": "simple",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "계약취소사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제18조(약관교부 및 설명의무 등) 제2항",
+      "content": "회사가 약관의 중요한 내용을 설명하지 않은 때 계약자는 계약이 성립한 날부터 3개월 이내에 계약을 취소할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contracts WHERE cancellation_reason = '약관미교부또는미설명' AND CAST(JULIANDAY(termination_date) - JULIANDAY(contract_date) AS INTEGER) <= 90"
+  },
+  {
+    "question_id": "UW037",
+    "question_ko": "보험금 가지급제도를 통해 추정 보험금의 50% 이내로 가지급된 건수와 총 가지급 금액은?",
+    "category": "보험금지급",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "보험금지급액",
+      "지급이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제8조(보험금의 지급절차) 제5항",
+      "content": "추가적인 조사가 이루어지는 경우 회사는 보험수익자의 청구에 따라 추정하는 보험금의 50% 상당액을 가지급보험금으로 지급한다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, SUM(provisional_payment_amount) AS total FROM claims WHERE provisional_payment_made = 1"
+  },
+  {
+    "question_id": "UW038",
+    "question_ko": "보험나이 오류(나이 기재 착오)로 보험금 및 보험료가 정정된 계약 건수와 평균 정정 금액은?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "나이정보",
+      "보험료정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제21조(보험나이 등) 제3항",
+      "content": "피보험자의 나이 또는 성별에 관한 기재사항이 사실과 다른 경우에는 정정된 나이 또는 성별에 해당하는 보험금 및 보험료로 변경한다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(ABS(corrected_premium - original_premium)) AS avg_correction FROM contracts WHERE age_correction_applied = 1"
+  },
+  {
+    "question_id": "UW039",
+    "question_ko": "강제집행으로 계약이 해지된 후 보험수익자가 특별부활(효력회복)을 신청한 건수는?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "계약상태이력",
+      "재무정보"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제28조(강제집행 등으로 인한 해지계약의 특별부활) 제1항",
+      "content": "계약자의 해지환급금 청구권에 대한 강제집행, 담보권실행, 체납처분절차에 따라 계약이 해지된 경우 해지 당시의 보험수익자가 특별부활을 청약할 수 있다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contract_revivals WHERE revival_reason = '특별부활' AND original_termination_reason IN ('강제집행', '담보권실행', '체납처분')"
+  },
+  {
+    "question_id": "UW040",
+    "question_ko": "보험종목 변경 건수 중 납입 시작 1년 미만에 변경을 신청하여 거절된 건수는?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "계약변경이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제20조(계약내용의 변경 등) 제3항",
+      "content": "회사는 계약자가 제1회 보험료를 납입한 때부터 1년 이상 지난 유효한 계약으로서 보험종목의 변경을 요청할 때에는 이를 변경하여 드린다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM contract_changes WHERE change_type = '보험종목변경' AND change_status = '거절' AND CAST(JULIANDAY(change_request_date) - JULIANDAY(first_premium_payment_date) AS INTEGER) < 365"
+  },
+  {
+    "question_id": "UW041",
+    "question_ko": "납입최고(독촉) 기간 14일 내에 연체 보험료를 납입하여 해지를 면한 계약 건수와 납입까지 평균 소요 일수는?",
+    "category": "계약관리",
+    "difficulty": "moderate",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "납입이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제26조(보험료의 납입이 연체되는 경우 납입최고와 계약의 해지) 제1항",
+      "content": "회사는 14일 이상의 기간을 납입최고기간으로 정하여 알려드린다"
+    },
+    "gold_sql": "SELECT COUNT(*) AS cnt, AVG(CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER)) AS avg_days FROM premium_notices WHERE paid_within_notice_period = 1 AND CAST(JULIANDAY(arrear_payment_date) - JULIANDAY(notice_date) AS INTEGER) <= 14"
+  },
+  {
+    "question_id": "UW042",
+    "question_ko": "보험금 청구 건 중 접수 후 3영업일 이내 지급 완료된 비율과 10영업일 초과 지급된 비율을 비교하면?",
+    "category": "보험금지급",
+    "difficulty": "challenging",
+    "sensitive_info_level": "low",
+    "sensitive_info_type": [
+      "보험금지급이력"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제8조(보험금의 지급절차) 제1항",
+      "content": "회사는 서류를 접수한 날부터 3영업일 이내에 보험금을 지급한다. 조사나 확인이 필요한 때에는 10영업일 이내에 지급한다"
+    },
+    "gold_sql": "SELECT ROUND(SUM(CASE WHEN business_days_to_payment <= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS within_3_days_pct, ROUND(SUM(CASE WHEN business_days_to_payment > 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS over_10_days_pct FROM claims WHERE claim_status = '지급완료'"
+  },
+  {
+    "question_id": "UW043",
+    "question_ko": "재해분류표 상 질병에 의한 호흡장해로 보험금 지급이 거절된 건수는?",
+    "category": "보험금지급",
+    "difficulty": "challenging",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "진단명",
+      "재해분류",
+      "보험금지급거절사유"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표4 재해분류표 제2호 제5항",
+      "content": "기타 호흡과 관련된 불의의 위협(W75~W84) 중 질병에 의한 호흡장해 및 삼킴장해는 재해분류에서 제외하여 보험금을 지급하지 않는다"
+    },
+    "gold_sql": "SELECT COUNT(*) FROM claims WHERE claim_denial_reason = '재해분류제외' AND icd_code BETWEEN 'W75' AND 'W84' AND denial_detail = '질병에의한호흡장해' AND claim_status = '지급거절'"
+  },
+  {
+    "question_id": "UW044",
+    "question_ko": "보험금 분할지급을 선택한 계약에서 추가 지급된 이자 총액은?",
+    "category": "보험금지급",
+    "difficulty": "challenging",
+    "sensitive_info_level": "medium",
+    "sensitive_info_type": [
+      "보험금지급액",
+      "지급방식"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "제9조(보험금 받는 방법의 변경) 제2항",
+      "content": "일시에 지급할 금액을 나누어 지급하는 경우에는 나중에 지급할 금액에 대하여 평균공시이율을 연단위 복리로 계산한 금액을 더한다"
+    },
+    "gold_sql": "SELECT SUM(interest_added_amount) FROM claims WHERE payment_method = '분할지급' AND interest_added_amount IS NOT NULL"
+  },
+  {
+    "question_id": "UW045",
+    "question_ko": "피보험자가 뇌졸중으로 장해 진단을 받은 후 발병일로부터 6개월 이내 장해 평가가 이루어진 건수 대비 6개월 이후 평가된 건수의 비율은?",
+    "category": "장해리스크",
+    "difficulty": "challenging",
+    "sensitive_info_level": "high",
+    "sensitive_info_type": [
+      "진단명",
+      "장해등급",
+      "건강상태"
+    ],
+    "source": {
+      "document": "생명보험 표준약관 [별표15]",
+      "article": "부표3 장해분류표 - 신경계·정신행동 장해 판정기준",
+      "content": "뇌졸중, 뇌손상, 척수 및 신경계의 질환 등은 발병 또는 외상 후 6개월 동안 지속적으로 치료한 후에 장해를 평가한다"
+    },
+    "gold_sql": "SELECT ROUND(COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) <= 180 THEN 1 END) * 100.0 / COUNT(CASE WHEN CAST(JULIANDAY(disability_assessment_date) - JULIANDAY(onset_date) AS INTEGER) > 180 THEN 1 END), 2) AS ratio FROM claims WHERE primary_diagnosis IN ('뇌졸중', '뇌손상') AND claim_type = '장해보험금'"
+  }
+]

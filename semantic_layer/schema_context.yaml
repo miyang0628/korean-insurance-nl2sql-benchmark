@@ -1,0 +1,217 @@
+cubes:
+- name: 계약
+  description: 보험계약 정보. 보험료, 보험금, 계약 상태, 심사 결과 등 포함.
+  dimensions:
+  - name: 계약ID
+    description: 계약 고유 식별자
+  - name: 상품유형
+    description: 상품 분류 (protection/savings/annuity/third_insurance/variable)
+  - name: 계약상태
+    description: 계약 현황 (active/terminated/expired/withdrawn)
+  - name: 해지사유
+    description: 계약 해지 이유 (고지의무위반/중대사유/납입연체 등)
+  - name: 취소사유
+    description: 청약 취소 이유
+  - name: 계약일
+    description: 청약일 (ISO 8601)
+  - name: 보장개시일
+    description: 보험 보장이 시작되는 날짜
+  - name: 해지일
+    description: 계약 해지 날짜
+  - name: 연금개시일
+    description: 연금 지급 시작 날짜
+  - name: 계약유형
+    description: 진단계약 또는 무진단계약
+  - name: 보장유형
+    description: 사망/장해/입원/연금 등
+  - name: 고지의무위반입증여부
+    description: 위반 사실이 보험금 지급에 영향을 미쳤는지 (1=입증됨)
+  - name: 사기유형
+    description: 사기 유형 (고의보험사고유발/서류위변조 등)
+  - name: 나이오류수정여부
+    description: 보험나이 착오로 보험료가 정정된 경우 (1=수정됨)
+  - name: 통화
+    description: 보험료 통화 (KRW/USD 등)
+  - name: 장해지급률재결정여부
+    description: 장해 악화로 지급률이 재결정된 경우 (1=재결정)
+  - name: 건강진단완료여부
+    description: 진단계약에서 건강진단 완료 여부 (1=완료)
+  - name: 타인사망보장여부
+    description: 타인 사망을 보험금 지급사유로 하는지 (1=해당)
+  - name: 피보험자서면동의여부
+    description: 피보험자의 서면 동의 여부 (1=동의)
+  measures:
+  - name: 월보험료
+    description: 월 납입 보험료 (원)
+  - name: 연보험료
+    description: 연 납입 보험료 (원)
+  - name: 기납입보험료
+    description: 지금까지 납입한 총 보험료 (원)
+  - name: 보험가입금액
+    description: 가입한 보험금 총액 (원)
+  - name: 사망보험금액
+    description: 사망 시 지급되는 보험금 (원)
+  - name: 해지환급금
+    description: 계약 해지 시 돌려받는 금액 (원)
+  - name: 계약자적립액
+    description: 현재 적립된 계약자 몫의 금액 (원)
+  - name: 대출잔액
+    description: 보험계약대출 잔액 (원)
+  - name: 납입횟수
+    description: 현재까지 납입 완료한 횟수
+  - name: 납입경과연수
+    description: 납입 시작 후 경과한 연수
+  - name: 계약시보험나이
+    description: 계약 체결 시점의 보험나이 (세)
+  - name: 수정전보험료
+    description: 나이 착오 수정 전 보험료 (원)
+  - name: 수정후보험료
+    description: 나이 착오 수정 후 보험료 (원)
+  - name: 현재원화환산보험료
+    description: 외화보험의 현재 원화 환산 월보험료
+  - name: 계약수
+    description: 계약 건수 집계
+- name: 청구
+  description: 보험금 청구 및 지급 정보.
+  dimensions:
+  - name: 청구유형
+    description: 청구 종류 (사망보험금/장해보험금/입원보험금/만기보험금)
+  - name: 청구상태
+    description: 처리 상태 (지급완료/지급거절/심사중/소멸시효완성)
+  - name: 지급방식
+    description: 일시지급 또는 분할지급
+  - name: 지급거절사유
+    description: 지급 거절 이유 (수익자고의피해/재해분류제외 등)
+  - name: 사망원인
+    description: 사망 원인 (자살/질병/재해 등)
+  - name: 사망처리유형
+    description: 실종선고 등 특수 사망 처리 유형
+  - name: 장해유형
+    description: 장해 종류 (심한추간판탈출증/흉복부장기심한장해 등)
+  - name: 장해신체부위
+    description: 장해 발생 신체 부위 (눈/귀/척추/팔/다리 등)
+  - name: 치매CDR점수
+    description: 임상치매척도 점수 (2~5점)
+  - name: 주진단명
+    description: 주요 진단 (뇌졸중/뇌손상 등)
+  - name: 조사동의여부
+    description: 보험금 지급사유 조사 동의 여부 (1=동의)
+  - name: 가지급여부
+    description: 가지급보험금 지급 여부 (1=지급)
+  - name: 청구일
+    description: 보험금 청구 접수일
+  - name: 지급예정일
+    description: 보험금 지급 예정일
+  - name: 실지급일
+    description: 실제 보험금 지급일
+  - name: 장해평가일
+    description: 장해 정도를 판정한 날짜
+  - name: 발병일
+    description: 질병 또는 재해 발병일
+  measures:
+  - name: 지급보험금
+    description: 실제 지급된 보험금액 (원)
+  - name: 가산이자
+    description: 지연 지급으로 발생한 가산이율 금액 (원)
+  - name: 가지급금액
+    description: 가지급보험금 금액 (원)
+  - name: 영업일수
+    description: 청구 접수부터 지급까지 영업일 수
+  - name: 장해지급률
+    description: 장해 분류표에 따른 지급률 (%)
+  - name: 장해확정일수
+    description: 재해일/진단일부터 장해지급률 확정까지 일수
+  - name: 실종일수
+    description: 실종선고의 실종 기간 (일)
+  - name: 추가이자
+    description: 분할지급 시 평균공시이율로 가산된 이자 (원)
+  - name: 청구수
+    description: 청구 건수 집계
+- name: 피보험자
+  description: 피보험자 인적사항.
+  dimensions:
+  - name: 피보험자ID
+    description: 피보험자 고유 식별자
+  - name: 성별
+    description: 성별 (M/F)
+  measures:
+  - name: 가입연령
+    description: 보험 가입 시점의 나이 (세)
+  - name: 현재보험나이
+    description: 현재 보험나이 (세)
+  - name: 피보험자수
+    description: 피보험자 수 집계
+- name: 상품
+  description: 보험상품 정보.
+  dimensions:
+  - name: 상품명
+    description: 상품 이름
+  - name: 상품분류
+    description: 상품 대분류 (protection/savings/annuity 등)
+  - name: 보험기간
+    description: 보장 기간 (whole_life/term/숫자)
+  - name: 보험기간년수
+    description: 보험기간 (년)
+  - name: 납입기간년수
+    description: 보험료 납입 기간 (년)
+  - name: 자동갱신여부
+    description: 자동갱신 상품 여부 (1=해당)
+  - name: 무해약환급금형여부
+    description: 무해약환급금형 상품 여부 (1=해당)
+  - name: 연금후사망보험금여부
+    description: 연금 개시 후에도 사망보험금 지급 여부 (1=해당)
+  - name: 보험유형
+    description: 생명보험/비생명보험 구분
+  - name: 실손보험소분류
+    description: 실손의료보험 세분류 (basic/elderly/high_risk)
+  - name: 공시이율적용여부
+    description: 금리연동형 여부
+  measures:
+  - name: 생존보험금합계
+    description: 생존 시 지급 예정 보험금 총합 (원)
+  - name: 예상납입보험료
+    description: 전체 납입 예상 보험료 (원)
+  - name: 최저보증이율
+    description: 금리연동형 최저 보증이율 (%)
+  - name: 입원공제율
+    description: 실손의료보험 입원 시 공제 비율 (소수점)
+  - name: 계약체결비용
+    description: 계약 체결에 사용되는 비용 (원)
+  - name: 표준해약공제액
+    description: 표준형 해약 공제금액 (원)
+  - name: 초기비용집중비율
+    description: 납입기간 대비 초기 집중 계약체결비용 비율
+- name: 언더라이팅
+  description: 보험 인수 심사 결과.
+  dimensions:
+  - name: 심사결과
+    description: 승낙/조건부승낙/거절
+  - name: 조건유형
+    description: 조건부 승낙 조건 (보험료할증/보장제외/보험금삭감/보험가입금액제한)
+  - name: 심사일
+    description: 심사 결정 날짜
+  measures:
+  - name: 보험료할증률
+    description: '표준 대비 할증 비율 (소수점, 예: 0.2 = 20% 할증)'
+  - name: 위험률할증률
+    description: 위험률 기준 할증 비율
+  - name: 추가할증률
+    description: 제3보험 15년 초과 추가 할증 비율
+  - name: 할증전위험보험료
+    description: 할증 적용 전 위험보험료 (원)
+  - name: 심사건수
+    description: 심사 건수 집계
+- name: 모집
+  description: 보험 모집 및 판매 채널 정보.
+  dimensions:
+  - name: 모집채널
+    description: 판매 경로 (telemarketing/bancassurance/agency/direct)
+  - name: 음성녹음완료여부
+    description: 통신판매 음성녹음 완료 여부 (1=완료)
+  - name: 품질점검결과
+    description: 표준설명대본 점검 결과 (pass/insufficient_explanation/fail)
+  - name: 점검일
+    description: 품질 점검 날짜
+  measures:
+  - name: 모집건수
+    description: 모집 건수 집계
